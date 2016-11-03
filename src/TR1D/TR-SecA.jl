@@ -1,4 +1,4 @@
-function ARC_Sec(h :: C2LineFunction,
+function TR_SecA(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 tol :: Float64=1e-7,
@@ -6,17 +6,16 @@ function ARC_Sec(h :: C2LineFunction,
                 verbose :: Bool=true)
     #print("on entre dans ")
     # Trust region parameters
-    eps1 = 0.1
-    eps2 = 0.75
+    eps1 = 0.2
+    eps2 = 0.8
     red = 0.5
     aug = 2
-    Δ = 0.5
+    Δ = 1.0
     t = t₀
 
     iter = 0;
     hₖ = obj(h,t)
     gₖ = grad(h, t)
-
 
     secₖ = 1.0
 
@@ -27,24 +26,15 @@ function ARC_Sec(h :: C2LineFunction,
 
     while ((abs(gₖ)>tol) & (iter < maxiter)) | (iter == 0)
 
-        #step computation
-        discr=secₖ^2-4*(gₖ/Δ)
-        if discr<0
-          discr=secₖ^2+4*(gₖ/Δ)
-        end
+        dS = -gₖ/secₖ; # direction de secante
 
-      #println("on a discr")
-
-        dNp=(-secₖ+sqrt(discr))/(2/Δ) #direction de Newton
-        dNp=-2*gₖ/(secₖ+sqrt(discr))
-
-        dNn=(-secₖ-sqrt(discr))/(2/Δ) #direction de Newton
-        #println("on a dNn")
-
-        if q(dNp)<q(dNn)
-            d=dNp
+        if q(Δ)<q(-Δ)
+            d=Δ
         else
-            d=dNn
+            d=-Δ
+        end
+        if (abs(dS)<Δ) & (q(d)>q(dS))
+            d=dS
         end
 
         # Numerical reduction computation
@@ -61,25 +51,35 @@ function ARC_Sec(h :: C2LineFunction,
         end
 
         ratio = ared / pred
-        if (ratio < eps1)
+        if (ratio < eps1) & (abs(d)==Δ)
             Δ = red*Δ
         else
             # two points memory
-            tpred = t
-            gₖₘ₁ = gₖ
+            tpred=t
+            gkm1=gₖ
+            hkm1=hₖ
 
-            t = t + d
-            hₖ = htestTR
-            gₖ = gtestTR
+            t=t+d
+            gₖ=gtestTR
+            hₖ=htestTR
 
-            s = t-tpred
-            y = gₖ - gₖₘ₁
-            secₖ = y/s
+            #secant improved two points interpolation
+            s=t-tpred
+            y=gₖ-gkm1
 
-            if ratio > eps2
-                Δ = aug * Δ
+            Γ=3*(gₖ+gkm1)*s-6*(hₖ-hkm1)
+            if (y*s+Γ)<eps(Float64)*(s^2) #correction trop petite
+              yt=y
+            else
+              yt=y+Γ/s
             end
-        end
+
+            secₖ=yt/s
+
+            if ratio>eps2
+              Δ=aug *Δ
+            end
+          end
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)

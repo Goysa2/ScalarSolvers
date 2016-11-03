@@ -1,23 +1,21 @@
-function ARC_Sec(h :: C2LineFunction,
-                t₀ :: Float64,
-                tₘ :: Float64;
+function TR_Sec(h :: C2LineFunction,
+               t₀ :: Float64,
+               tₘ :: Float64;
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
                 verbose :: Bool=true)
     #print("on entre dans ")
     # Trust region parameters
-    eps1 = 0.1
-    eps2 = 0.75
+    eps1 = 0.2
+    eps2 = 0.8
     red = 0.5
     aug = 2
-    Δ = 0.5
+    Δ = 1.0
     t = t₀
 
     iter = 0;
     hₖ = obj(h,t)
     gₖ = grad(h, t)
-
-
     secₖ = 1.0
 
     q(d) = hₖ + gₖ*d + 0.5*secₖ*d^2
@@ -27,24 +25,15 @@ function ARC_Sec(h :: C2LineFunction,
 
     while ((abs(gₖ)>tol) & (iter < maxiter)) | (iter == 0)
 
-        #step computation
-        discr=secₖ^2-4*(gₖ/Δ)
-        if discr<0
-          discr=secₖ^2+4*(gₖ/Δ)
-        end
+        dS = -gₖ/secₖ; # direction de secante
 
-      #println("on a discr")
-
-        dNp=(-secₖ+sqrt(discr))/(2/Δ) #direction de Newton
-        dNp=-2*gₖ/(secₖ+sqrt(discr))
-
-        dNn=(-secₖ-sqrt(discr))/(2/Δ) #direction de Newton
-        #println("on a dNn")
-
-        if q(dNp)<q(dNn)
-            d=dNp
+        if q(Δ)<q(-Δ)
+            d=Δ
         else
-            d=dNn
+            d=-Δ
+        end
+        if (abs(dS)<Δ) & (q(d)>q(dS))
+            d=dS
         end
 
         # Numerical reduction computation
@@ -61,7 +50,7 @@ function ARC_Sec(h :: C2LineFunction,
         end
 
         ratio = ared / pred
-        if (ratio < eps1)
+        if (ratio < eps1) & (abs(d)==Δ)
             Δ = red*Δ
         else
             # two points memory

@@ -1,5 +1,6 @@
 function ARC_Nwt(hh :: C2LineFunction,
-                t₀ :: Float64;
+                 t₀ :: Float64,
+                 tₘ :: Float64;
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
                 verbose :: Bool=true)

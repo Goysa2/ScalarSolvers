@@ -1,3 +1,4 @@
+export bissect_secA
 function bissect_secA(h :: C2LineFunction,
                     t₀ :: Float64,
                     t₁ :: Float64;

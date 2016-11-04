@@ -1,3 +1,4 @@
+export ARC_Cub
 function ARC_Cub(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;

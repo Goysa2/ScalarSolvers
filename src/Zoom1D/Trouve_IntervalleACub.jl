@@ -1,3 +1,4 @@
+export trouve_intervalleACub
 function trouve_intervalleACub(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;

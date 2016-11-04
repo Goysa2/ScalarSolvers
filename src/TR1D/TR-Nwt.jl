@@ -1,3 +1,4 @@
+export TR_Nwt
 function TR_Nwt(hh :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;

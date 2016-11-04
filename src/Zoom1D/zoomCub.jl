@@ -1,3 +1,4 @@
+export zoom_Cub
 function zoom_Cub(h :: C2LineFunction,
                 t₀ :: Float64,
                 t₁ :: Float64;

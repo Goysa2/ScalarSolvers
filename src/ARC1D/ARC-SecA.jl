@@ -1,3 +1,4 @@
+export ARC_SecA
 function ARC_SecA(h :: C2LineFunction,
                  t₀ :: Float64,
                  tₘ :: Float64;

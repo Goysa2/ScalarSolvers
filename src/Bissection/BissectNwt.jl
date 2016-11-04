@@ -1,3 +1,4 @@
+export bissect_nwt
 function bissect_nwt(h :: C2LineFunction,
                     t₀ :: Float64,
                     t₁ :: Float64;

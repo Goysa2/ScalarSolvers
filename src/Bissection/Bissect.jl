@@ -1,3 +1,4 @@
+export bissect
 function bissect(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;

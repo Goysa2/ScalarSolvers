@@ -1,3 +1,4 @@
+export ARC_Nwt
 function ARC_Nwt(hh :: C2LineFunction,
                  t₀ :: Float64,
                  tₘ :: Float64;

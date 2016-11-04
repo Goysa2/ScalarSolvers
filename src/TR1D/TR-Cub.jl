@@ -1,3 +1,4 @@
+export TR_Cub
 function TR_Cub(h :: C2LineFunction,
                t₀ :: Float64,
                tₘ :: Float64;

@@ -1,3 +1,4 @@
+export trouve_intervalleANwt
 function trouve_intervalleANwt(h :: C2LineFunction,
                 t₀ :: Float64,
                 #inc0 :: Float64;

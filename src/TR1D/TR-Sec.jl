@@ -1,3 +1,4 @@
+export TR_Sec
 function TR_Sec(h :: C2LineFunction,
                t₀ :: Float64,
                tₘ :: Float64;

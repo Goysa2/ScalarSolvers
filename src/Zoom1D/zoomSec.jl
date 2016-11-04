@@ -1,3 +1,4 @@
+export zoom_Sec
 function zoom_Sec(h :: C2LineFunction,
                 t₀ :: Float64,
                 t₁ :: Float64;

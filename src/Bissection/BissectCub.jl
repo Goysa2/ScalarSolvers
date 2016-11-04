@@ -1,3 +1,4 @@
+export bissect_Cub
 function bissect_Cub(h :: C2LineFunction,
                     t₀ :: Float64,
                     t₁ :: Float64;

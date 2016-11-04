@@ -3,7 +3,7 @@ function trouve_intervalleASecA(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,
-                verbose :: Bool=true)
+                verbose :: Bool=false)
 
         ϵ₂=1e-5
 

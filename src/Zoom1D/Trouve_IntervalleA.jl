@@ -1,4 +1,4 @@
-export trouve_intervalleAs
+export trouve_intervalleA
 function trouve_intervalleA(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;

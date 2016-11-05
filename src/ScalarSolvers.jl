@@ -1,5 +1,12 @@
 module ScalarSolvers
 
-# package code goes here
+using JuMP
+using NLPModels
+using Optimize
+using Roots
+
+include("includes.jl")
+
+include("solvers.jl")
 
 end # module

@@ -2,7 +2,7 @@ function trouve_intervalleA(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,
-                verbose :: Bool=true)
+                verbose :: Bool=false)
 
         tim1=t₀
         ti=(tim1+tₘ)/2
@@ -33,9 +33,9 @@ function trouve_intervalleA(h :: C2LineFunction,
           if ((hi>h₀+0.01*dh₀) ||(hi>him1)) & (i>1)
             #println("1er if")
             (topt,iter)=zoom(h,tim1,ti)
-            if obj(h,topt)<obj(h,t₀)
-              println("h(0)<h(t*)")
-            end
+            # if obj(h,topt)<obj(h,t₀)
+            #   println("h(0)<h(t*)")
+            # end
             return (topt,iter)
           end
 

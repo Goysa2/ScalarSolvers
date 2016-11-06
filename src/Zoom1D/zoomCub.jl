@@ -7,7 +7,7 @@ function zoom_Cub(h :: C2LineFunction,
                 maxiter :: Int=100,
                 verbose :: Bool=false)
 
-        println("on est dans zoom")
+        #println("on est dans zoom")
 
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀
@@ -17,7 +17,7 @@ function zoom_Cub(h :: C2LineFunction,
           th=t₀
         end
 
-        println("t₀=",t₀," t₁=",t₁)
+        #println("t₀=",t₀," t₁=",t₁)
 
         if t₀<t₁
           tmin=t₀
@@ -26,7 +26,7 @@ function zoom_Cub(h :: C2LineFunction,
           tmin=t₁
           tmax=t₀
         end
-        println("tmin=",tmin," tmax=",tmax)
+        #println("tmin=",tmin," tmax=",tmax)
 
         γ=0.8
 

@@ -17,7 +17,7 @@ function zoom_Nwt(h :: C2LineFunction,
           th=t₀
         end
 
-        println("t₀=",t₀," t₁=",t₁)
+        #println("t₀=",t₀," t₁=",t₁)
 
         if t₀<t₁
           tmin=t₀
@@ -26,7 +26,7 @@ function zoom_Nwt(h :: C2LineFunction,
           tmin=t₁
           tmax=t₀
         end
-        println("tmin=",tmin," tmax=",tmax)
+        #println("tmin=",tmin," tmax=",tmax)
 
         γ=0.8
 
@@ -127,7 +127,7 @@ function zoom_Nwt(h :: C2LineFunction,
             hi=obj(h,tiN)
             dhi=grad(h,tiN)
             ddhi=hess(h,tiN)
-            print_with_color(:green,"N")
+            verbose && print_with_color(:green,"N")
             #println("ti=",ti,"   hi=",hi,"   dhi=",dhi, "   ddhi=",ddhi)
           else
             #println("on choisi tiB")
@@ -135,7 +135,7 @@ function zoom_Nwt(h :: C2LineFunction,
             hi=obj(h,tiB)
             dhi=grad(h,tiB)
             ddhi=hess(h,tiB)
-            print_with_color(:green,"B")
+            verbose && print_with_color(:green,"B")
             #println("ti=",ti,"   hi=",hi,"   dhi=",dhi, "   ddhi=",ddhi)
           end
 

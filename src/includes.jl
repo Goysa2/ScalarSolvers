@@ -21,3 +21,11 @@ include("Zoom1D/zoomCub.jl")
 include("Zoom1D/zoomNwt.jl")
 include("Zoom1D/zoomSec.jl")
 include("Zoom1D/zoomSecA.jl")
+
+#include bissection
+include("Bissection/Trouve_Intervalle.jl")
+include("Bissection/Bissect.jl")
+include("Bissection/BissectCub.jl")
+include("Bissection/BissectNwt.jl")
+include("Bissection/BissectSec.jl")
+include("Bissection/BissectSecA.jl")

@@ -3,7 +3,7 @@ function trouve_intervalleANwt(h :: C2LineFunction,
                 #inc0 :: Float64;
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,
-                verbose :: Bool=true)
+                verbose :: Bool=false)
 
         ϵ₂=1e-5
 
@@ -35,14 +35,14 @@ function trouve_intervalleANwt(h :: C2LineFunction,
           hi=obj(h,tiB)
           dhi=grad(h,tiB)
           ddhi=hess(h,tiB)
-          print_with_color(:green,"B")
+          verbose && print_with_color(:green,"B")
         else
           #println("on choisit tiN")
           ti=tiN
           hi=obj(h,tiN)
           dhi=grad(h,tiN)
           ddhi=hess(h,tiN)
-          #print_with_color(:green,"N")
+          verbose && print_with_color(:green,"N")
         end
 
         #println("on a les paramètres de trouve intervalle")
@@ -110,7 +110,7 @@ function trouve_intervalleANwt(h :: C2LineFunction,
             hi=obj(h,tiB)
             dhi=grad(h,tiB)
             ddhi=hess(h,tiB)
-            print_with_color(:green,"B")
+            verbose && print_with_color(:green,"B")
             #println("ti=",ti,"   hi=",hi,"   dhi=",dhi, "   ddhi=",ddhi)
           else
             #println("on choisi tiN")
@@ -118,7 +118,7 @@ function trouve_intervalleANwt(h :: C2LineFunction,
             hi=obj(h,tiN)
             dhi=grad(h,tiN)
             ddhi=hess(h,tiN)
-            print_with_color(:green,"N")
+            verbose && print_with_color(:green,"N")
             #println("ti=",ti,"   hi=",hi,"   dhi=",dhi, "   ddhi=",ddhi)
           end
 

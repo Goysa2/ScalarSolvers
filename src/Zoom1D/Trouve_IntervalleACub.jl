@@ -2,7 +2,7 @@ function trouve_intervalleACub(h :: C2LineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,
-                verbose :: Bool=true)
+                verbose :: Bool=false)
 
         ϵ₂=1e-5
 
@@ -71,7 +71,7 @@ function trouve_intervalleACub(h :: C2LineFunction,
         #   end
         # end
 
-        println("on a les paramètres de trouve intervalle")
+        #println("on a les paramètres de trouve intervalle")
 
         verbose && @printf("iter tim1      dhim1      him1       ti      dhi      hi\n")
         verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,him1,ti,dhi,hi)
@@ -148,13 +148,13 @@ function trouve_intervalleACub(h :: C2LineFunction,
             ti=tiB
             hi=obj(h,tiB)
             dhi=grad(h,tiB)
-            print_with_color(:green,"B")
+            verbose && print_with_color(:green,"B")
           else
             #println("on choisit tiC")
             ti=tiC
             hi=obj(h,tiC)
             dhi=grad(h,tiC)
-            print_with_color(:green,"C")
+            verbose && print_with_color(:green,"C")
           end
 
           if t>ti

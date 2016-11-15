@@ -1,5 +1,5 @@
 export ARC_Nwt
-function ARC_Nwt(hh :: C2LineFunction,
+function ARC_Nwt(hh :: AbstractLineFunction,
                  t₀ :: Float64,
                  tₘ :: Float64;
                 tol :: Float64=1e-7,

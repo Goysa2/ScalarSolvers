@@ -1,5 +1,5 @@
 export ARC_Sec
-function ARC_Sec(h :: C2LineFunction,
+function ARC_Sec(h :: AbstractLineFunction,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 tol :: Float64=1e-7,

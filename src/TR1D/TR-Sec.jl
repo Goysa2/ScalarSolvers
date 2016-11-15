@@ -1,5 +1,5 @@
 export TR_Sec
-function TR_Sec(h :: C2LineFunction,
+function TR_Sec(h :: AbstractLineFunction,
                t₀ :: Float64,
                tₘ :: Float64;
                 tol :: Float64=1e-7,

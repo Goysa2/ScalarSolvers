@@ -1,5 +1,5 @@
 export trouve_intervalle
-function trouve_intervalle(h :: C2LineFunction,
+function trouve_intervalle(h :: AbstractLineFunction,
                 t₀ :: Float64,
                 inc0 :: Float64;
                 verbose :: Bool=false)

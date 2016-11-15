@@ -1,17 +1,10 @@
 export bissect_sec
-function bissect_sec(h :: C2LineFunction,
-                    t₀ :: Float64,
-                    t₁ :: Float64;
-                    tol :: Float64=1e-7,
-                    maxiter :: Int=50,
-                    verbose :: Bool=false)
-
-              g=grad(h,t₀)
-              k=hess(h,t₀)
-              inc=abs(g/k)
-
-              (tₐ,tᵦ,iter)=trouve_intervalle(h,t₀,inc)
-
+function bissect_sec(h :: AbstractLineFunction,
+                     tₐ :: Float64,
+                     tᵦ :: Float64;
+                     tol :: Float64=1e-7,
+                     maxiter :: Int=50,
+                     verbose :: Bool=false)
 
               γ=0.8
               t=tᵦ

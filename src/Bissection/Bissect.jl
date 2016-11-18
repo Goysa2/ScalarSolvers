@@ -6,12 +6,14 @@ function bissect(h :: AbstractLineFunction,
                 maxiter :: Int=50,
                 verbose :: Bool=true)
 
-        hₐ=obj(h,tₐ)
+      if tₐ==tᵦ
+        topt=tᵦ
+        iter=0
+        return (topt,iter)
+      else
         gₐ=grad(h,tₐ)
-        hᵦ=obj(h,tᵦ)
         gᵦ=grad(h,tᵦ)
         iter=0
-
 
         verbose && @printf(" iter        tₐ        tᵦ         gₐ        gᵦ        \n")
         verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₐ,tᵦ,gₐ,gᵦ)
@@ -33,5 +35,5 @@ function bissect(h :: AbstractLineFunction,
         topt=(tₐ+tᵦ)/2
 
         return (topt, iter)
-
+      end
 end

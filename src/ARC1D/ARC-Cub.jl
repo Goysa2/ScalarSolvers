@@ -5,6 +5,10 @@ function ARC_Cub(h :: AbstractLineFunction,
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
                 verbose :: Bool=true)
+
+    nf=0
+    ng=0
+    nh=0
     #print("on entre dans ")
     # Trust region parameters
     eps1 = 0.2
@@ -16,7 +20,9 @@ function ARC_Cub(h :: AbstractLineFunction,
 
     iter = 0;
     hₖ = obj(h,t)
+    nf+=1
     gₖ = grad(h, t)
+    ng+=1
 
 
     secₖ = 1.0
@@ -62,7 +68,9 @@ function ARC_Cub(h :: AbstractLineFunction,
 
       #numerical reduction computation
       htestTR=obj(h,t+d)
+      nf+=1
       gtestTR=grad(h,t+d)
+      ng+=1
       pred=gₖ*d + A*d^2 + B*d^3
       if pred>-1e-10
         ared=(gₖ+gtestTR)*d/2
@@ -101,7 +109,8 @@ function ARC_Cub(h :: AbstractLineFunction,
 
       iter += 1
       verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
+      println("nf=",nf," ng=",ng," nh=",nh)
     end
-
+    println("nf=",nf," ng=",ng," nh=",nh)
     return (t, iter)
 end

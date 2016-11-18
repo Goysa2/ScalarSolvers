@@ -6,6 +6,12 @@ function bissect_sec(h :: AbstractLineFunction,
                      maxiter :: Int=50,
                      verbose :: Bool=false)
 
+          if tₐ==tᵦ
+           topt=tᵦ
+           iter=0
+           return (topt,iter)
+          else
+
               γ=0.8
               t=tᵦ
               tₚ=tₐ
@@ -13,7 +19,7 @@ function bissect_sec(h :: AbstractLineFunction,
               hₖ=0
               hkm1=0
               gkm1=0
-              hₚ=0
+              hplus=0
               iter=0
 
               gₖ=grad(h,t)
@@ -33,12 +39,12 @@ function bissect_sec(h :: AbstractLineFunction,
 
                 if ((tₚ-t)*dN>0) & (dN/(tₚ-t)<γ)
                   tplus = t + dN
-                  hplus = obj(h, tplus)
+                  #hplus = obj(h, tplus)
                   gplus = grad(h,tplus)
                   verbose && print_with_color(:green,"N")
                 else
                   tplus = (t+tₚ)/2
-                  hplus = obj(h, tplus)
+                  #hplus = obj(h, tplus)
                   gplus = grad(h,tplus)
                   verbose && print_with_color(:green,"B")
                 end
@@ -76,5 +82,5 @@ function bissect_sec(h :: AbstractLineFunction,
                 topt=t
                 return (topt,iter)
 
-
+          end
 end

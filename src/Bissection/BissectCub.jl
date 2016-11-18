@@ -6,6 +6,12 @@ function bissect_Cub(h :: AbstractLineFunction,
                     maxiter :: Int=50,
                     verbose :: Bool=false)
 
+            if tₐ==tᵦ
+              topt=tᵦ
+              iter=0
+            return (topt,iter)
+            else
+
               γ=0.8
               t=tᵦ
               tₚ=tₐ
@@ -85,6 +91,7 @@ function bissect_Cub(h :: AbstractLineFunction,
 
                 topt=t
                 return (topt,iter)
+            end
 
 
 end

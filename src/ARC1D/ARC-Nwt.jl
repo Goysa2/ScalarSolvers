@@ -6,6 +6,10 @@ function ARC_Nwt(hh :: AbstractLineFunction,
                 maxiter :: Int=50,
                 verbose :: Bool=true)
 
+    nf=0
+    ng=0
+    nh=0
+
     # Trust region parameters
     eps1 = 0.1
     eps2 = 0.75

@@ -5,6 +5,10 @@ function bissect_nwt(h :: AbstractLineFunction,
                     tol :: Float64=1e-7,
                     maxiter :: Int=50,
                     verbose :: Bool=false)
+
+        #nf=0
+        #nh=0
+        #ng=0
         if tₐ==tᵦ
           topt=tᵦ
           iter=0
@@ -18,32 +22,32 @@ function bissect_nwt(h :: AbstractLineFunction,
           hₖ=0
           hkm1=0
           gkm1=0
-          hₚ=0
+          hplus=0
           iter=0
 
           gₖ=grad(h,t)
+          #ng+=1
 
           verbose && @printf(" iter        tₚ        t         dN         gₖ          gplus        \n")
           verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,0.0,gₖ, 0.0)
 
           while ((abs(gₖ)>tol) & (iter<maxiter)) || (iter==0)
-              #println("on entre dans le while: ", iter)
-              # s = t-tqnp
-              # y = gₖ-gkm1
 
               kₖ=hess(h,t)
+              #nh+=1
               dN=-gₖ/kₖ #direction de Newton
-              #println("on a la direction de Newton: ", dN)
 
               if ((tₚ-t)*dN>0) & (dN/(tₚ-t)<γ)
                 tplus = t + dN
-                hplus = obj(h, tplus)
+                #hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
+                #ng+=1
                 verbose && println("N")
               else
                 tplus = (t+tₚ)/2
-                hplus = obj(h, tplus)
+                #hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
+                #ng+=1
                 verbose && println("B")
               end
 
@@ -75,6 +79,8 @@ function bissect_nwt(h :: AbstractLineFunction,
               gₖ=gplus
               iter=iter+1
               verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,dN,gₖ,gplus)
+              #verbose && println(" f=",nf," g=",ng," h=",nh)
+              #sleep(10)
             end
                 topt=t
                 return (topt,iter)

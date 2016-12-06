@@ -7,6 +7,7 @@ function zoom_SecA(h :: AbstractLineFunction,
                 ϵ :: Float64=1e-10,
                 maxiter :: Int=100,
                 verbose :: Bool=false)
+        print_with_color(:magenta,"zoom_Cub")
 
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀
@@ -16,117 +17,125 @@ function zoom_SecA(h :: AbstractLineFunction,
           th=t₀
         end
 
-        if t₀<t₁
-          tmin=t₀
-          tmax=t₁
-        else
-          tmin=t₁
-          tmax=t₀
-        end
-
-        γ=0.8
-
-        h₀=obj(h,t₀)
-        dh₀=grad(h,t₀)
-
         hl=obj(h,tl)
         dhl=grad(h,tl)
         hh=obj(h,th)
         dhh=grad(h,th)
 
+        h₀=obj(h,t₀)
+        dh₀=grad(h,t₀)
+
+        γ=0.8
         t=t₁
-        ti=t
-        tim1=t₀
+        tp=t₀
         tqnp=t₀
-        him1=0
-        dhim1=0
-        hi=0
-        dhi=0
+        hk=0
+        hkm1=0
+        gkm1=0
+        hp=0
         i=0
 
-        hi=obj(h,t)
-        dhi=grad(h,t)
-        him1=obj(h,tqnp)
-        dhim1=grad(h,tqnp)
+        hk=obj(h,t)
+        gk=grad(h,t)
+        hkm1=obj(h,tqnp)
+        gkm1=grad(h,tqnp)
 
-        verbose && @printf(" iter      tₗ       tₕ        tᵢ        hₗ        hₕ        hᵢ        dhᵢ\n")
-        verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,ti,hl,hh,hi,dhi)
+        verbose && println("on a les paramètre de zoom")
 
-        while ((i<50) & (abs(dhi)>tol)) || (i==0)
+        verbose && @printf(" iter        tₗ        tₕ         t        hₗ        hₕ         hk         gk\n")
+        verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,t,hl,hh,hk,gk)
 
-          if (i>0) & ((hi>h₀+c₁*ti*dh₀) || (hl<=hi))
-            th=ti
+
+        while ((i<maxiter) & (abs(gk)>tol)) || i==0
+          if i==0
+            verbose && println("on est dans le while de zoom")
+          end
+          #hk=obj(h,t)
+          if (hk>h₀+c₁*(t-t₀)*dh₀) || (hl<=hk)
+            if (hk>h₀+c₁*t*dh₀)
+              verbose && println("(hk>h₀+c₁*ti*dh₀)")
+            else
+              verbose && println("(hl<=hk)")
+            end
+            th=t
+            hh=hk
+            dhh=gk
           else
-            if (abs(dhi)<ϵ) & (i>0)
-              topt=ti
+            verbose && verbose && println("else")
+            #gk=grad(h,t)
+            if (abs(gk)<ϵ)
+              verbose && print(abs(gk),"<",-0.99*dh₀)
+              verbose && println("1er if dans le else zoom")
+              topt=t
               iter=i
               return (topt,iter)
-            elseif dhi*(th-tl)>=0
+            elseif gk*(th-tl)>=0
+              verbose && println("elseif dans le else de zoom")
               th=tl
+              hh=hl
+              dhh=dhl
             end
-            tl=ti
+            tl=t
+            hl=hk
+            dhl=gk
           end
 
-          hl=obj(h,tl)
-          dhl=grad(h,tl)
-          hh=obj(h,th)
-          dhh=grad(h,th)
+          s = t-tqnp
+          y = gk-gkm1
 
-          s=ti-tqnp
-          y=dhi-dhim1
-          Γ=3*(hi+dhim1)*s-6*(hi-him1)
+          Γ=3*(gk+gkm1)*s-6*(hk-hkm1)
           if y*s+Γ < eps(Float64)*(s^2)
             yt=y
           else
             yt=y+Γ/s
           end
 
-          dS=-dhi*s/yt
+          dS=-gk*s/yt
 
-          tiB=(tim1+ti)/2
-          tiS=ti+dS
-
-          him1=hi
-          dhim1=dhi
-
-          if ((tmin<tiS) & (tiS<tmax)) & (obj(h,tiS)<hl)
-            ti=tiS
-            hi=obj(h,tiS)
-            dhi=grad(h,tiS)
-            verbose && print_with_color(:green,"S")
+          if ((tp-t)*dS>0) & (dS/(tp-t)<γ)
+            tplus = t + dS
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("N")
           else
-            ti=tiB
-            hi=obj(h,tiB)
-            dhi=grad(h,tiB)
-            verbose && print_with_color(:green,"B")
+            tplus = (t+tp)/2
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("B")
           end
 
-          if t>ti
-            if dhi<0
-              tim1=t
+          if t>tp
+            if gplus<0
+              tp=t
               tqnp=t
-              t=ti
+              t=tplus
             else
               tqnp=t
-              t=ti
+              t=tplus
             end
           else
-            if dhi>0
-              tim1=t
+            if gplus>0
+              tp=t
               tqnp=t
-              t=ti
+              t=tplus
             else
               tqnp=t
-              t=ti
+              t=tplus
             end
           end
 
+          #mise à jour des valeurs
+          hkm1=hk
+          gkm1=gk
+          hk=hplus
+          gk=gplus
           i=i+1
-          verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,ti,hl,hh,hi,dhi)
+          #println("on continue d'itérer")
+          verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,t,hl,hh,hk,gk)
 
         end
-        topt=ti
+        topt=t
         iter=i
-        return (topt,iter)
 
+        return (topt,iter)
 end

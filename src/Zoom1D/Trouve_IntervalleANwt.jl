@@ -1,103 +1,92 @@
 export trouve_intervalleANwt
 function trouve_intervalleANwt(h :: AbstractLineFunction,
-                t₀ :: Float64,
-                #inc0 :: Float64;
-                tₘ :: Float64;
-                ϵ :: Float64=1e-10,
-                verbose :: Bool=false)
+                               t₀ :: Float64,
+                               tₘ :: Float64;
+                               ϵ :: Float64=1e-10,
+                               verbose :: Bool=false)
 
-        ϵ₂=1e-5
-
-        tim1=t₀
-        him1=obj(h,tim1)
-        dhim1=grad(h,tim1)
-        ddhim1=hess(h,tim1)
-
-        dN=-dhim1/ddhim1
-
-        tiN=tim1+dN
-        tiB=(tim1+tₘ)/2
-        i=0
-
-        distt0=abs(tₘ-t₀)
-        disttiN=abs(tₘ-tiN)
+        print_with_color(:magenta,"trouve_intervalleACub")
 
         h₀=obj(h,t₀)
         dh₀=grad(h,t₀)
-        ddh₀=hess(h,t₀)
 
+        γ=0.8
+        t=tₘ
+        tp=t₀
+        tqnp=t₀
+        hk=0
+        hkm1=0
+        gkm1=0
+        hp=0
+        i=0
 
+        hk=obj(h,t)
+        gk=grad(h,t)
+        hkm1=obj(h,tqnp)
+        gkm1=grad(h,tqnp)
 
-        if (tiN<tim1) || (tiN>tₘ)
-          ti=tiB
-          hi=obj(h,tiB)
-          dhi=grad(h,tiB)
-          ddhi=hess(h,tiB)
-          verbose && print_with_color(:green,"B")
-        else
-          ti=tiN
-          hi=obj(h,tiN)
-          dhi=grad(h,tiN)
-          ddhi=hess(h,tiN)
-          verbose && print_with_color(:green,"N")
-        end
+        verbose && @printf("iter tp        gkm1        hkm1         t        gk        hk\n")
+        verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tp,gkm1,hkm1,t,gk,hk)
 
-        verbose && @printf("iter tim1      dhim1      ddhim1      him1       ti      dhi      hi\n")
-        verbose && @printf("%4d %7.2e %7.2e  %7.2e %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,ddhim1,him1,ti,dhi,hi)
-
-        if (abs(dhi)<ϵ) & (ddhi>=0)
-          topt=ti
-          iter=i
-          return (topt,iter)
-        end
-
-        while (ti<tₘ) || (abs(dhi)>ϵ)
-
-          if ((hi>h₀+0.01*ti*dh₀) ||(hi>him1)) & (i>1)
-            (topt,iter)=zoom_Nwt(h,tim1,ti)
+        while  i<50
+          if (hk>h₀+0.01*(t-t₀)*dh₀) ||((hk>hkm1) & (i>1))
+            (topt,iter)=zoom_Nwt(h,tp,t,verbose=false)
             return (topt,iter)
           end
 
-          if (abs(dhi)<=ϵ)
+          if (abs(gk)<=ϵ)
             iter=i
-            topt=ti
+            topt=t
             return (topt,iter)
           end
 
-          if (dhi)>=0
-            (topt,iter)=zoom_Nwt(h,ti,tim1)
+          if (gk>=0)
+            (topt,iter)=zoom_Nwt(h,t,tp,verbose=false)
             return (topt,iter)
           end
 
-          tim1=ti
-          him1=hi
-          dhim1=dhi
-          ddhim1=ddhi
+          kk=hess(h,t)
+          dN=-gk/kk
 
-          dN=-dhim1/ddhim1
-
-          tiN=tim1+dN
-          tiB=(tim1+tₘ)/2
-
-          if (tiN<tim1) || (tiN>tₘ)
-            ti=tiB
-            hi=obj(h,tiB)
-            dhi=grad(h,tiB)
-            ddhi=hess(h,tiB)
-            verbose && print_with_color(:green,"B")
+          if ((tp-t)*dN>0) & (dN/(tp-t)<γ)
+            tplus = t + dN
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("C")
           else
-            ti=tiN
-            hi=obj(h,tiN)
-            dhi=grad(h,tiN)
-            ddhi=hess(h,tiN)
-            verbose && print_with_color(:green,"N")
+            tplus = (t+tp)/2
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("B")
           end
 
+          if t>tp
+            if gplus<0
+              tp=t
+              tqnp=t
+              t=tplus
+            else
+              tqnp=t
+              t=tplus
+            end
+          else
+            if gplus>0
+              tp=t
+              tqnp=t
+              t=tplus
+            else
+              tqnp=t
+              t=tplus
+            end
+          end
+
+          hkm1=hk
+          gkm1=gk
+          hk=hplus
+          gk=gplus
           i=i+1
 
-          verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,him1,ti,dhi,hi)
-
+          verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tp,gkm1,hkm1,t,gk,hk)
         end
-return (ti,i)
 
 end

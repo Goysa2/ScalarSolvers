@@ -4,105 +4,96 @@ function trouve_intervalleASecA(h :: AbstractLineFunction,
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,
                 verbose :: Bool=false)
-
-        ϵ₂=1e-5
+        print_with_color(:magenta,"trouve_intervalleACub")
 
         h₀=obj(h,t₀)
         dh₀=grad(h,t₀)
 
+        γ=0.8
         t=tₘ
-        ti=t
-        tim1=t₀
+        tp=t₀
         tqnp=t₀
-        him1=0
-        dhim1=0
-        hi=0
-        dhi=0
+        hk=0
+        hkm1=0
+        gkm1=0
+        hp=0
         i=0
 
-        hi=obj(h,t)
-        dhi=grad(h,t)
-        him1=obj(h,tqnp)
-        dhim1=grad(h,tqnp)
+        hk=obj(h,t)
+        gk=grad(h,t)
+        hkm1=obj(h,tqnp)
+        gkm1=grad(h,tqnp)
 
-        verbose && @printf("iter tim1      dhim1      him1       ti      dhi      hi\n")
-        verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,him1,ti,dhi,hi)
+        verbose && @printf("iter tp        gkm1        hkm1         t        gk        hk\n")
+        verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tp,gkm1,hkm1,t,gk,hk)
 
-        while i==0 || ((abs(dhi)>ϵ) & (i<50))
-
-          if ((hi>h₀+0.01*t*dh₀) ||(hi>him1)) & (i>1)
-            (topt,iter)=zoom_Sec(h,tim1,ti)
+        while  i<50
+          if (hk>h₀+0.01*(t-t₀)*dh₀) ||((hk>hkm1) & (i>1))
+            (topt,iter)=zoom_SecA(h,tp,t,verbose=false)
             return (topt,iter)
           end
 
-          if (i>0) & (abs(dhi)<=ϵ)
+          if (abs(gk)<=ϵ)
             iter=i
-            topt=ti
+            topt=t
             return (topt,iter)
           end
 
-          if (dhi)>=0
-            (topt,iter)=zoom_Sec(h,ti,tim1)
+          if (gk>=0)
+            (topt,iter)=zoom_SecA(h,t,tp,verbose=false)
             return (topt,iter)
-          end
+         end
 
-          s=t-tqnp
-          y=dhi-dhim1
+          s = t-tqnp
+          y = gk-gkm1
 
-
-          Γ=3*(hi+dhim1)*s-6*(hi-him1)
+          Γ=3*(gk+gkm1)*s-6*(hk-hkm1)
           if y*s+Γ < eps(Float64)*(s^2)
             yt=y
           else
             yt=y+Γ/s
           end
 
-          dS=-dhi*s/yt
+          dS=-gk*s/yt
 
-          tiB=(ti+t)/2
-          tiS=t+dS
-
-          him1=hi
-          dhim1=dhi
-
-          if (tiS<t₀) || (tiS>tₘ)
-            ti=tiB
-            hi=obj(h,tiB)
-            dhi=grad(h,tiB)
-            verbose && print_with_color(:green,"B")
+          if ((tp-t)*dS>0) & (dS/(tp-t)<γ)
+            tplus = t + dS
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("N")
           else
-            ti=tiS
-            hi=obj(h,tiS)
-            dhi=grad(h,tiS)
-            verbose && print_with_color(:green,"S")
+            tplus = (t+tp)/2
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("B")
           end
 
-          if t>ti
-            if dhi<0
-              tim1=t
+          if t>tp
+            if gplus<0
+              tp=t
               tqnp=t
-              t=ti
+              t=tplus
             else
               tqnp=t
-              t=ti
+              t=tplus
             end
           else
-            if dhi>0
-              tim1=t
+            if gplus>0
+              tp=t
               tqnp=t
-              t=ti
+              t=tplus
             else
               tqnp=t
-              t=ti
+              t=tplus
             end
           end
 
+          #mise à jour des valeurs
+          hkm1=hk
+          gkm1=gk
+          hk=hplus
+          gk=gplus
           i=i+1
-
-          verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,him1,ti,dhi,hi)
-
-
+          verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,gkm1,hkm1,ti,gk,hk)
         end
-return (ti,i)
-
 end

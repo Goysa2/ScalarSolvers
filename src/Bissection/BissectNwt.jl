@@ -26,7 +26,6 @@ function bissect_nwt(h :: AbstractLineFunction,
           iter=0
 
           gₖ=grad(h,t)
-          #ng+=1
 
           verbose && @printf(" iter        tₚ        t         dN         gₖ          gplus        \n")
           verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,0.0,gₖ, 0.0)
@@ -41,13 +40,11 @@ function bissect_nwt(h :: AbstractLineFunction,
                 tplus = t + dN
                 #hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
-                #ng+=1
                 verbose && println("N")
               else
                 tplus = (t+tₚ)/2
                 #hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
-                #ng+=1
                 verbose && println("B")
               end
 

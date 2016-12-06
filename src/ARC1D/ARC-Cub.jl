@@ -109,8 +109,8 @@ function ARC_Cub(h :: AbstractLineFunction,
 
       iter += 1
       verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
-      println("nf=",nf," ng=",ng," nh=",nh)
+      #println("nf=",nf," ng=",ng," nh=",nh)
     end
-    println("nf=",nf," ng=",ng," nh=",nh)
+    #println("nf=",nf," ng=",ng," nh=",nh)
     return (t, iter)
 end

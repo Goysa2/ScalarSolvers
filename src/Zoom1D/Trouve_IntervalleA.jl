@@ -1,9 +1,9 @@
 export trouve_intervalleA
 function trouve_intervalleA(h :: AbstractLineFunction,
-                t₀ :: Float64,
-                tₘ :: Float64;
-                ϵ :: Float64=1e-10,
-                verbose :: Bool=false)
+                           t₀ :: Float64,
+                           tₘ :: Float64;
+                           ϵ :: Float64=1e-10,
+                           verbose :: Bool=false)
 
         tim1=t₀
         ti=(tim1+tₘ)/2
@@ -21,18 +21,16 @@ function trouve_intervalleA(h :: AbstractLineFunction,
         verbose && @printf("iter tim1        dhim1        him1         ti        dhi        hi\n")
         verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n", i, tim1,dhim1,him1,ti,dhi,hi)
 
-        if (abs(dhi)<ϵ)
-          topt=ti
-          iter=i
-          return (topt,iter)
-        end
-
         while  i<50
-          if ((hi>h₀+0.01*dh₀) ||(hi>him1)) & (i>1)
+          him1=hi
+          hi=obj(h,ti)
+          if (hi>h₀+0.01*(ti-t₀)*dh₀) ||((hi>him1) & (i>1))
             (topt,iter)=zoom(h,tim1,ti)
             return (topt,iter)
           end
 
+          dhim1=dhi
+          dhi=grad(h,ti)
           if (abs(dhi)<=ϵ)
             iter=i
             topt=ti
@@ -46,11 +44,6 @@ function trouve_intervalleA(h :: AbstractLineFunction,
 
           tim1=ti
           ti=(tim1+tₘ)/2
-
-          him1=hi
-          dhim1=dhi
-          hi=obj(h,ti)
-          dhi=grad(h,ti)
 
           i=i+1
 

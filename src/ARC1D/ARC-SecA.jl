@@ -34,7 +34,7 @@ function ARC_SecA(h :: AbstractLineFunction,
           discr=secₖ^2+4*(gₖ/Δ)
         end
 
-      #println("on a discr")
+       #println("on a discr")
 
         dNp=(-secₖ+sqrt(discr))/(2/Δ) #direction de Newton
         dNp=-2*gₖ/(secₖ+sqrt(discr))

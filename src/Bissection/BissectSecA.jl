@@ -1,62 +1,77 @@
 export bissect_secA
 function bissect_secA(h :: AbstractLineFunction,
-                    tₐ :: Float64,
-                    tᵦ :: Float64;
+                    t0 :: Float64,
+                    t1 :: Float64;
                     tol :: Float64=1e-7,
                     maxiter :: Int=50,
                     verbose :: Bool=false)
-        if tₐ==tᵦ
-          topt=tₐ
+
+        println("t0=",t0)
+        println("t1=",t1)
+
+
+        if t0==t1
+          topt=t0
           iter=0
           return (topt,iter)
         else
 
           γ=0.8
-          t=tᵦ
-          tₚ=tₐ
-          tqnp=tₐ
-          hₖ=0
+          t=t1
+          println("t=",t)
+          tp=t0
+          println("tp=",tp)
+          tqnp=t0
+          hk=0
           hkm1=0
           gkm1=0
-          hₚ=0
+          hplus=0
           iter=0
 
-          hₖ=obj(h,t)
-          gₖ=grad(h,t)
+          hk=obj(h,t)
+          gk=grad(h,t)
           hkm1=obj(h,tqnp)
           gkm1=grad(h,tqnp)
 
-          verbose && @printf(" iter        tₚ        t         dN         gₖ          gplus        \n")
-          verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,0.0,gₖ, 0.0)
+          verbose && @printf(" iter        tp        t         dN         gk          gplus        \n")
+          verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tp,t,0.0,gk, 0.0)
 
-          while ((abs(gₖ)>tol) & (iter<maxiter)) || (iter==0)
+          while ((abs(gk)>tol) & (iter<maxiter)) || (iter==0)
               #println("on entre dans le while: ", iter)
               s = t-tqnp
-              y = gₖ-gkm1
+              #verbose && println("s=",s)
+              y = gk-gkm1
+              #println("y=",y)
 
-              Γ=3*(gₖ+gkm1)*s-6*(hₖ-hkm1)
+              Γ=3*(gk+gkm1)*s-6*(hk-hkm1)
+              verbose && println("gamma=",Γ)
               if y*s+Γ < eps(Float64)*(s^2)
                 yt=y
+                verbose && println("yt=y")
+                verbose && println("yt=",yt)
               else
                 yt=y+Γ/s
+                verbose && println("yt=y+Γ/s")
+                verbose && println("yt=",yt)
               end
-              dN=-gₖ*s/yt
+              dN=-gk*s/yt
+              verbose && println("dN=",dN)
 
-              if ((tₚ-t)*dN>0) & (dN/(tₚ-t)<γ)
+              if ((tp-t)*dN>0) & (dN/(tp-t)<γ)
                 tplus = t + dN
                 hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
                 verbose && println("N")
               else
-                tplus = (t+tₚ)/2
+                tplus = (t+tp)/2
                 hplus = obj(h, tplus)
                 gplus = grad(h,tplus)
                 verbose && println("B")
               end
 
-              if t>tₚ
+              if t>tp
                 if gplus<0
-                  tₚ=t
+                  tp=t
                   tqnp=t
                   t=tplus
                 else
@@ -65,7 +80,7 @@ function bissect_secA(h :: AbstractLineFunction,
                 end
               else
                 if gplus>0
-                  tₚ=t
+                  tp=t
                   tqnp=t
                   t=tplus
                 else
@@ -75,12 +90,13 @@ function bissect_secA(h :: AbstractLineFunction,
               end
 
               #mise à jour des valeurs
-              hkm1=hₖ
-              gkm1=gₖ
-              hₖ=hplus
-              gₖ=gplus
+              hkm1=hk
+              gkm1=gk
+              hk=hplus
+              gk=gplus
               iter=iter+1
-              verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,dN,gₖ,gplus)
+
+              verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tp,t,dN,gk,gplus)
             end
 
           topt=t

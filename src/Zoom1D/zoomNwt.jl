@@ -7,6 +7,7 @@ function zoom_Nwt(h :: AbstractLineFunction,
                 ϵ :: Float64=1e-10,
                 maxiter :: Int=100,
                 verbose :: Bool=false)
+        print_with_color(:magenta,"zoom_Cub")
 
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀
@@ -16,107 +17,123 @@ function zoom_Nwt(h :: AbstractLineFunction,
           th=t₀
         end
 
-        if t₀<t₁
-          tmin=t₀
-          tmax=t₁
-        else
-          tmin=t₁
-          tmax=t₀
-        end
-
-        γ=0.8
+        hl=obj(h,tl)
+        dhl=grad(h,tl)
+        hh=obj(h,th)
+        dhh=grad(h,th)
 
         h₀=obj(h,t₀)
         dh₀=grad(h,t₀)
 
-        hl=obj(h,tl)
-        dhl=grad(h,tl)
-        ddhl=hess(h,tl)
-        hh=obj(h,th)
-        dhh=grad(h,th)
-        ddhh=hess(h,th)
-
-        dN=-dhl/ddhl
-
+        γ=0.8
+        t=t₁
+        tp=t₀
+        tqnp=t₀
+        hk=0
+        hkm1=0
+        gkm1=0
+        hp=0
         i=0
 
-        tiN= tl + dN
-        tiB=(tl+th)/2
+        hk=obj(h,t)
+        gk=grad(h,t)
+        hkm1=obj(h,tqnp)
+        gkm1=grad(h,tqnp)
 
-        if (tiN>tmin) & (tiN<tmax)
-          ti=tiN
-          hi=obj(h,tiN)
-          dhi=grad(h,tiN)
-          ddhi=hess(h,tiN)
-          verbose && print_with_color(:green,"N")
-        else
-          ti=tiB
-          hi=obj(h,tiB)
-          dhi=grad(h,tiB)
-          ddhi=hess(h,tiB)
-          verbose && print_with_color(:green,"B")
-        end
+        verbose && println("on a les paramètre de zoom")
 
-        verbose && @printf(" iter      tₗ       tₕ        tᵢ        hₗ        hₕ        hᵢ        dhᵢ\n")
-        verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,ti,hl,hh,hi,dhi)
+        verbose && @printf(" iter        tₗ        tₕ         t        hₗ        hₕ         hk         gk\n")
+        verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,t,hl,hh,hk,gk)
 
-        while ((i<50) & (abs(dhi)>tol)) || i==0
-          if (hi>h₀+c₁*ti*dh₀) || (hl<=hi)
-            th=ti
+
+        while ((i<maxiter) & (abs(gk)>tol)) || i==0
+          if i==0
+            verbose && println("on est dans le while de zoom")
+          end
+          #hk=obj(h,t)
+          if (hk>h₀+c₁*(t-t₀)*dh₀) || (hl<=hk)
+            if (hk>h₀+c₁*t*dh₀)
+              verbose && println("(hk>h₀+c₁*ti*dh₀)")
+            else
+              verbose && println("(hl<=hk)")
+            end
+            th=t
             tlast=th
+            hlast=hh
+            dhlast=dhh
+            hh=hk
+            dhh=gk
           else
-            if (abs(dhi)<ϵ)
-              topt=ti
+            verbose && verbose && println("else")
+            #gk=grad(h,t)
+            if (abs(gk)<ϵ)
+              verbose && print(abs(gk),"<",-0.99*dh₀)
+              verbose && println("1er if dans le else zoom")
+              topt=t
               iter=i
               return (topt,iter)
-            elseif dhi*(th-tl)>=0
+            elseif gk*(th-tl)>=0
+              verbose && println("elseif dans le else de zoom")
               th=tl
+              hh=hl
+              dhh=dhl
             end
-            tl=ti
-            tlast=ti
+            tl=t
+            tlast=tl
+            hlast=hl
+            dhlast=dhl
+            hl=hk
+            dhl=gk
           end
 
+          kₖ=hess(h,t)
+          dN=-gk/kₖ #direction de Newton
 
-          hl=obj(h,tl)
-          dhl=grad(h,tl)
-          ddhl=hess(h,tl)
-          hh=obj(h,th)
-          dhh=grad(h,th)
-          ddhh=hess(h,th)
-
-          hlast=obj(h,tlast)
-          dhlast=grad(h,tlast)
-          ddhlast=hess(h,tlast)
-
-          dN=-dhlast/ddhlast
-
-          tiN=ti+dN
-          tiB=(tl+th)/2
-
-
-          if ((tmin<tiN) & (tiN<tmax)) & (obj(h,tiN)<hl)
-            ti=tiN
-            hi=obj(h,tiN)
-            dhi=grad(h,tiN)
-            ddhi=hess(h,tiN)
-            verbose && print_with_color(:green,"N")
+          if ((tp-t)*dN>0) & (dN/(tp-t)<γ)
+            tplus = t + dN
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("N")
           else
-            ti=tiB
-            hi=obj(h,tiB)
-            dhi=grad(h,tiB)
-            ddhi=hess(h,tiB)
-            verbose && print_with_color(:green,"B")
+            tplus = (t+tp)/2
+            hplus = obj(h, tplus)
+            gplus = grad(h,tplus)
+            verbose && println("B")
           end
 
-          i=i+1
+          if t>tp
+            if gplus<0
+              tp=t
+              tqnp=t
+              t=tplus
+            else
+              tqnp=t
+              t=tplus
+            end
+          else
+            if gplus>0
+              tp=t
+              tqnp=t
+              t=tplus
+            else
+              tqnp=t
+              t=tplus
+            end
+          end
 
-          verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,ti,hl,hh,hi,dhi)
+
+          #mise à jour des valeurs
+          hkm1=hk
+          gkm1=gk
+          hk=hplus
+          gk=gplus
+          i=i+1
+          #println("on continue d'itérer")
+          verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,t,hl,hh,hk,gk)
 
         end
-        topt=ti
+        topt=t
         iter=i
 
-
         return (topt,iter)
-
 end

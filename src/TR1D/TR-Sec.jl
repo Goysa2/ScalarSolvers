@@ -2,9 +2,9 @@ export TR_Sec
 function TR_Sec(h :: AbstractLineFunction,
                t₀ :: Float64,
                tₘ :: Float64;
-                tol :: Float64=1e-7,
-                maxiter :: Int=50,
-                verbose :: Bool=true)
+               tol :: Float64=1e-7,
+               maxiter :: Int=50,
+               verbose :: Bool=true)
     #print("on entre dans ")
     # Trust region parameters
     eps1 = 0.2

@@ -6,9 +6,6 @@ function ARC_Cub(h :: AbstractLineFunction,
                 maxiter :: Int=50,
                 verbose :: Bool=true)
 
-    nf=0
-    ng=0
-    nh=0
     #print("on entre dans ")
     # Trust region parameters
     eps1 = 0.2
@@ -20,10 +17,7 @@ function ARC_Cub(h :: AbstractLineFunction,
 
     iter = 0;
     hₖ = obj(h,t)
-    nf+=1
     gₖ = grad(h, t)
-    ng+=1
-
 
     secₖ = 1.0
     dN=-gₖ #pour la première iter
@@ -35,20 +29,14 @@ function ARC_Cub(h :: AbstractLineFunction,
     verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter,t,gₖ,Δ)
 
     while ((abs(gₖ)>tol) & (iter < maxiter)) || (iter == 0)
-      #println("premier &")
 
       #Step computation
       Quad(t)=hₖ+gₖ*t+A*t^2+B*t^3+(1/(4*Δ))*t^4
       dQuad(t)=gₖ+2*A*t+3*B*t^2+(1/Δ)*t^3
 
-      #println(Quad(t))
-      #println(dQuad(t))
-
       dR=roots(dQuad)
-      #println("longeur de dR:")
-      #println(length(dR))
+
       vmin=Inf
-      #dN=0
       for i=1:length(dR)
         rr=dR[i]
         if isreal(rr)
@@ -56,7 +44,6 @@ function ARC_Cub(h :: AbstractLineFunction,
           vact=Quad(rr)
           if rr*gₖ<0
             if vact<vmin
-              #println("deuxième &")
               dN=rr
               vmin=vact
             end
@@ -66,11 +53,8 @@ function ARC_Cub(h :: AbstractLineFunction,
 
       d=dN
 
-      #numerical reduction computation
       htestTR=obj(h,t+d)
-      nf+=1
       gtestTR=grad(h,t+d)
-      ng+=1
       pred=gₖ*d + A*d^2 + B*d^3
       if pred>-1e-10
         ared=(gₖ+gtestTR)*d/2
@@ -109,8 +93,6 @@ function ARC_Cub(h :: AbstractLineFunction,
 
       iter += 1
       verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
-      #println("nf=",nf," ng=",ng," nh=",nh)
     end
-    #println("nf=",nf," ng=",ng," nh=",nh)
     return (t, iter)
 end

@@ -2,9 +2,9 @@ export ARC_Nwt
 function ARC_Nwt(hh :: AbstractLineFunction,
                  t₀ :: Float64,
                  tₘ :: Float64;
-                tol :: Float64=1e-7,
-                maxiter :: Int=50,
-                verbose :: Bool=true)
+                 tol :: Float64=1e-7,
+                 maxiter :: Int=50,
+                 verbose :: Bool=true)
 
     nf=0
     ng=0
@@ -37,6 +37,7 @@ function ARC_Nwt(hh :: AbstractLineFunction,
         if discr<0
           discr=kₖ^2+4*(gₖ/Δ)
         end
+
         if kₖ<0
           dNp=(-kₖ+sqrt(discr))/(2/Δ) #direction de Newton
         else

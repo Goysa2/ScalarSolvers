@@ -4,6 +4,11 @@ include("ARC1D/ARC-Nwt.jl")
 include("ARC1D/ARC-Sec.jl")
 include("ARC1D/ARC-SecA.jl")
 
+include("ARC1D/new_ARC_Nwt.jl")
+include("ARC1D/new_ARC_Sec.jl")
+include("ARC1D/new_ARC_SecA.jl")
+include("ARC1D/direction_computation.jl")
+
 #include Trust Region methods
 include("TR1D/TR-Cub.jl")
 include("TR1D/TR-Nwt.jl")

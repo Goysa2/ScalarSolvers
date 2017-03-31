@@ -11,8 +11,6 @@ function trouve_intervalle(h :: AbstractLineFunction,
         inc=inc0
         t₁=t₀+sd*inc
 
-        println("inc=",inc," sd=",sd," t₁=",t₁)
-
         h₁=obj(h,t₁)
         g₁=grad(h,t₁)
 

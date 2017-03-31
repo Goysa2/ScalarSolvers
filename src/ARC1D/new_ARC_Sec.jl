@@ -16,13 +16,13 @@ function new_ARC_Sec(h :: AbstractLineFunction,
     t = t₀
 
     iter = 0;
-    hₖ = obj(h,t)
+    fₖ = obj(h,t)
     gₖ = grad(h, t)
 
 
     secₖ = 1.0
 
-    #q(d) = hₖ + gₖ*d + 0.5*secₖ*d^2
+    #q(d) = fₖ + gₖ*d + 0.5*secₖ*d^2 + (1/3*(α))*abs(d)^3
 
     verbose && @printf(" iter  t         gₖ          α        pred         ared\n")
     verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter,t,gₖ,α)
@@ -52,10 +52,10 @@ function new_ARC_Sec(h :: AbstractLineFunction,
       #       d=dNn
       #   end
 
-      d=ARC_step_computation(hₖ,gₖ,α)
+      d=ARC_step_computation(secₖ,gₖ,α)
 
         # Numerical reduction computation
-        htestTR = obj(h,t+d)
+        ftestTR = obj(h,t+d)
         gtestTR = grad(h,t+d)
 
         pred = gₖ*d + 0.5*secₖ*d^2
@@ -64,7 +64,7 @@ function new_ARC_Sec(h :: AbstractLineFunction,
         if pred > - 1e-10
             ared = (gₖ + gtestTR)*d/2
         else
-            ared = htestTR-hₖ
+            ared = ftestTR-fₖ
         end
 
         ratio = ared / pred
@@ -76,7 +76,7 @@ function new_ARC_Sec(h :: AbstractLineFunction,
             gₖₘ₁ = gₖ
 
             t = t + d
-            hₖ = htestTR
+            fₖ = ftestTR
             gₖ = gtestTR
 
             s = t-tpred

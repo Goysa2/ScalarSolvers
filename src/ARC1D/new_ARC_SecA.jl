@@ -15,12 +15,12 @@ function new_ARC_SecA(h :: AbstractLineFunction,
     t = t₀
 
     iter = 0;
-    hₖ = obj(h,t)
+    fₖ = obj(h,t)
     gₖ = grad(h, t)
 
     secₖ = 1.0
 
-    #q(d) = hₖ + gₖ*d + 0.5*secₖ*d^2
+    #q(d) = fₖ + gₖ*d + 0.5*secₖ*d^2 + (1/3*(α))*abs(d)^3
 
     verbose && @printf(" iter  t         gₖ          Δ        pred         ared\n")
     verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter,t,gₖ,Δ)
@@ -50,10 +50,10 @@ function new_ARC_SecA(h :: AbstractLineFunction,
       #       d=dNn
       #   end
 
-      d=ARC_step_computation(hₖ,gₖ,Δ)
+      d=ARC_step_computation(secₖ,gₖ,Δ)
 
         # Numerical reduction computation
-        htestTR = obj(h,t+d)
+        ftestTR = obj(h,t+d)
         gtestTR = grad(h,t+d)
 
         pred = gₖ*d + 0.5*secₖ*d^2
@@ -62,7 +62,7 @@ function new_ARC_SecA(h :: AbstractLineFunction,
         if pred > - 1e-10
             ared = (gₖ + gtestTR)*d/2
         else
-            ared = htestTR-hₖ
+            ared = ftestTR-fₖ
         end
 
         ratio = ared / pred
@@ -72,17 +72,17 @@ function new_ARC_SecA(h :: AbstractLineFunction,
             #two point memory
             tpred=t
             gkm1=gₖ
-            hkm1=hₖ
+            fkm1=fₖ
 
             t=t+d
             gₖ=gtestTR
-            hₖ=htestTR
+            fₖ=ftestTR
 
             #secant improved two points interpolation
             s=t-tpred
             y=gₖ-gkm1
 
-            Γ=3*(gₖ+gkm1)*s-6*(hₖ-hkm1)
+            Γ=3*(gₖ+gkm1)*s-6*(fₖ-fkm1)
             if y*s+Γ < eps(Float64)*(s^2)
               yt=y
             else

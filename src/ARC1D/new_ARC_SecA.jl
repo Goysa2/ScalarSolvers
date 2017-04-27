@@ -4,13 +4,18 @@ function new_ARC_SecA(h :: AbstractLineFunction,
                  tₘ :: Float64;
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
-                verbose :: Bool=true)
+                verbose :: Bool=true,
+                eps1 :: Float64=0.25,
+                eps2 :: Float64=0.75,
+                red :: Float64=0.2,
+                aug :: Float64=5.0)
+
     #print("on entre dans ")
     # Trust region parameters
-    eps1 = 0.1
-    eps2 = 0.8
-    red = 0.2
-    aug = 5
+    #eps1 = 0.2
+    #eps2 = 0.8
+    #red = 0.2
+    #aug = 5
     Δ = 0.5
     t = t₀
 
@@ -67,9 +72,11 @@ function new_ARC_SecA(h :: AbstractLineFunction,
 
         ratio = ared / pred
         if (ratio < eps1)
+          #print_with_color(:red,"ratio<eps1 \n")
             Δ = red*Δ
         else
             #two point memory
+            #print_with_color(:yellow,"ratio>eps1 \n")
             tpred=t
             gkm1=gₖ
             fkm1=fₖ

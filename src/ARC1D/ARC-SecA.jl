@@ -4,13 +4,18 @@ function ARC_SecA(h :: AbstractLineFunction,
                  tₘ :: Float64;
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
-                verbose :: Bool=true)
+                verbose :: Bool=true,
+                eps1 :: Float64=0.1,
+                eps2 :: Float64=0.8,
+                red :: Float64=0.2,
+                aug :: Float64=5.0)
+                
     #print("on entre dans ")
     # Trust region parameters
-    eps1 = 0.1
-    eps2 = 0.8
-    red = 0.2
-    aug = 5
+    # eps1 = 0.1
+    # eps2 = 0.8
+    # red = 0.2
+    # aug = 5
     Δ = 0.5
     t = t₀
 

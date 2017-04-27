@@ -4,17 +4,21 @@ function ARC_Nwt(hh :: AbstractLineFunction,
                  tₘ :: Float64;
                  tol :: Float64=1e-7,
                  maxiter :: Int=50,
-                 verbose :: Bool=true)
+                 verbose :: Bool=true,
+                 eps1 :: Float64=0.1,
+                 eps2 :: Float64=0.1,
+                 red :: Float64=0.1,
+                 aug :: Float64=5.0)
 
     nf=0
     ng=0
     nh=0
 
     # Trust region parameters
-    eps1 = 0.1
-    eps2 = 0.75
-    red = 0.1
-    aug = 5.0
+    # eps1 = 0.1
+    # eps2 = 0.75
+    # red = 0.1
+    # aug = 5.0
     Δ = 1.0
     t = t₀
 

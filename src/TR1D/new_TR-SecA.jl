@@ -1,21 +1,22 @@
-export TR_Sec
-function TR_Sec(h :: AbstractLineFunction,
-               t₀ :: Float64,
-               tₘ :: Float64;
-               tol :: Float64=1e-7,
-               maxiter :: Int=50,
-               verbose :: Bool=true,
-               eps1 :: Float64=0.2,
-               eps2 :: Float64=0.8,
-               red:: Float64=0.5,
-               aug :: Float64=2.0,
-               Δ :: Float64 = 1.0)
+export new_TR_SecA
+function new_TR_SecA(h :: AbstractLineFunction,
+                t₀ :: Float64,
+                tₘ :: Float64;
+                tol :: Float64=1e-7,
+                maxiter :: Int=50,
+                verbose :: Bool=true,
+                eps1 :: Float64=0.2,
+                eps2 :: Float64=0.8,
+                red :: Float64=0.5,
+                aug :: Float64=2.0,
+                Δ :: Float64=1.0)
 
     t = t₀
 
     iter = 0;
     fₖ = obj(h,t)
     gₖ = grad(h, t)
+
     secₖ = 1.0
 
     q(d) = fₖ + gₖ*d + 0.5*secₖ*d^2
@@ -27,14 +28,7 @@ function TR_Sec(h :: AbstractLineFunction,
 
         dS = -gₖ/secₖ; # direction de secante
 
-        if q(Δ)<q(-Δ)
-            d=Δ
-        else
-            d=-Δ
-        end
-        if (abs(dS)<Δ) & (q(d)>q(dS))
-            d=dS
-        end
+        d=TR_step_computation(hₖ,secₖ,dS,Δ)
 
         # Numerical reduction computation
         ftestTR = obj(h,t+d)
@@ -54,27 +48,35 @@ function TR_Sec(h :: AbstractLineFunction,
             Δ = red*Δ
         else
             # two points memory
-            tpred = t
-            gₖₘ₁ = gₖ
+            tpred=t
+            gkm1=gₖ
+            fkm1=fₖ
 
-            t = t + d
-            fₖ = ftestTR
-            gₖ = gtestTR
+            t=t+d
+            gₖ=gtestTR
+            fₖ=ftestTR
 
-            s = t-tpred
-            y = gₖ - gₖₘ₁
-            secₖ = y/s
+            #secant improved two points interpolation
+            s=t-tpred
+            y=gₖ-gkm1
 
-            if ratio > eps2
-                Δ = aug * Δ
+            Γ=3*(gₖ+gkm1)*s-6*(fₖ-fkm1)
+            if (y*s+Γ)<eps(Float64)*(s^2) #correction trop petite
+              yt=y
+            else
+              yt=y+Γ/s
             end
-        end
+
+            secₖ=yt/s
+
+            if ratio>eps2
+              Δ=aug *Δ
+            end
+          end
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
     end
 
-    nftot=h.nlp.counters.neval_obj+h.nlp.counters.neval_grad+h.nlp.counters.neval_hprod
-    ht=obj(h,t)
-    return (t, true,ht,nftot)
+    return (t, iter)
 end

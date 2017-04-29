@@ -7,13 +7,18 @@ include("ARC1D/ARC-SecA.jl")
 include("ARC1D/new_ARC_Nwt.jl")
 include("ARC1D/new_ARC_Sec.jl")
 include("ARC1D/new_ARC_SecA.jl")
-include("ARC1D/direction_computation.jl")
+include("ARC1D/ARC_direction_computation.jl")
 
 #include Trust Region methods
 include("TR1D/TR-Cub.jl")
 include("TR1D/TR-Nwt.jl")
 include("TR1D/TR-Sec.jl")
 include("TR1D/TR-SecA.jl")
+
+include("TR1D/new_TR-Nwt.jl")
+include("TR1D/new_TR-Sec.jl")
+include("TR1D/new_TR-SecA.jl")
+include("TR1D/TR_direction_computation.jl")
 
 #include zoom
 include("Zoom1D/Trouve_IntervalleA.jl")

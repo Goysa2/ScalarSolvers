@@ -4,50 +4,51 @@ function TR_Nwt(hh :: AbstractLineFunction,
                 tₘ :: Float64;
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
-                verbose :: Bool=true)
+                verbose :: Bool=true,
+                eps1 :: Float64=0.2,
+                eps2 :: Float64=0.8,
+                red :: Float64=0.5,
+                aug :: Float64=2.0,
+                Δ :: Float64=1.0)
 
-    # Trust region parameters
-    eps1 = 0.2
-    eps2 = 0.8
-    red = 0.5
-    aug = 2
-    Δ = 1.0
+
     t = t₀
 
     iter = 0;
-    hₖ = obj(hh,t)
+    fₖ = obj(hh,t)
     gₖ = grad(hh, t)
-    kₖ = hess(hh,t)
+    hₖ = hess(hh,t)
 
-    q(d) = hₖ + gₖ*d + 0.5*kₖ*d^2
+    q(d) = fₖ + gₖ*d + 0.5*hₖ*d^2
 
     verbose && @printf(" iter  t         gₖ          Δ        pred         ared\n")
     verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter,t,gₖ,Δ)
 
     while ((abs(gₖ)>tol) & (iter < maxiter)) || (iter == 0)
 
-        dN = -gₖ/kₖ; # direction de Newton
+        dN = -gₖ/hₖ; # direction de Newton
 
         if q(Δ)<q(-Δ)
             d=Δ
         else
             d=-Δ
         end
+
         if (abs(dN)<Δ) & (q(d)>q(dN))
             d=dN
         end
 
         # Numerical reduction computation
-        htestTR = obj(hh,t+d)
+        ftestTR = obj(hh,t+d)
         gtestTR = grad(hh,t+d)
 
-        pred = gₖ*d + 0.5*kₖ*d^2
+        pred = gₖ*d + 0.5*hₖ*d^2
 
         # truc numérique pour éviter les erreurs d'arrondi lorsque la réduction est faible
         if pred > - 1e-10
             ared = (gₖ + gtestTR)*d/2
         else
-            ared = htestTR-hₖ
+            ared = ftestTR-fₖ
         end
 
         ratio = ared / pred
@@ -57,8 +58,8 @@ function TR_Nwt(hh :: AbstractLineFunction,
             t=t+d
 
             gₖ=gtestTR
-            hₖ=htestTR
-            kₖ=hess(hh,t)
+            fₖ=ftestTR
+            hₖ=hess(hh,t)
 
             if ratio > eps2
                 Δ = aug * Δ

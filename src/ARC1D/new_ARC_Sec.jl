@@ -5,7 +5,7 @@ function new_ARC_Sec(h :: AbstractLineFunction,
                 tol :: Float64=1e-7,
                 maxiter :: Int=50,
                 verbose :: Bool=true,
-                eps1 :: Float64=0.25,
+                eps1 :: Float64=0.1,
                 eps2 :: Float64=0.75,
                 red :: Float64=0.5,
                 aug :: Float64=2.0)

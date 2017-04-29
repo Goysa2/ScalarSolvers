@@ -1,5 +1,5 @@
-export TR_Sec
-function TR_Sec(h :: AbstractLineFunction,
+export new_TR_Sec
+function new_TR_Sec(h :: AbstractLineFunction,
                t₀ :: Float64,
                tₘ :: Float64;
                tol :: Float64=1e-7,
@@ -27,14 +27,7 @@ function TR_Sec(h :: AbstractLineFunction,
 
         dS = -gₖ/secₖ; # direction de secante
 
-        if q(Δ)<q(-Δ)
-            d=Δ
-        else
-            d=-Δ
-        end
-        if (abs(dS)<Δ) & (q(d)>q(dS))
-            d=dS
-        end
+        d=TR_step_computation(hₖ,secₖ,dS,Δ)
 
         # Numerical reduction computation
         ftestTR = obj(h,t+d)

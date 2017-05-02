@@ -3,7 +3,8 @@ module ScalarSolvers
 using JuMP
 using NLPModels
 using Optimize
-using PolynomialRoots
+#using PolynomialRoots
+using Polynomials
 
 include("includes.jl")
 

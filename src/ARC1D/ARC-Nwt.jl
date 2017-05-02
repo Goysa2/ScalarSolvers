@@ -6,7 +6,7 @@ function ARC_Nwt(hh :: AbstractLineFunction,
                  maxiter :: Int=50,
                  verbose :: Bool=true,
                  eps1 :: Float64=0.1,
-                 eps2 :: Float64=0.1,
+                 eps2 :: Float64=0.75,
                  red :: Float64=0.1,
                  aug :: Float64=5.0)
 

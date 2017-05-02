@@ -74,7 +74,5 @@ function TR_Sec(h :: AbstractLineFunction,
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
     end
 
-    nftot=h.nlp.counters.neval_obj+h.nlp.counters.neval_grad+h.nlp.counters.neval_hprod
-    ht=obj(h,t)
-    return (t, true,ht,nftot)
+    return (t, iter)
 end

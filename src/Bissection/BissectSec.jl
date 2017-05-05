@@ -32,10 +32,8 @@ function bissect_sec(h :: AbstractLineFunction,
                 #println("on entre dans le while: ", iter)
                 s = t-tqnp
                 y = gₖ-gkm1
-                #println("s=",s," y=",y)
 
                 dN=-gₖ*s/y #direction de Newton
-                #println("on a la direction de Newton: ", dN)
 
                 if ((tₚ-t)*dN>0) & (dN/(tₚ-t)<γ)
                   tplus = t + dN
@@ -68,7 +66,6 @@ function bissect_sec(h :: AbstractLineFunction,
                     t=tplus
                   end
                 end
-
 
                 #mise à jour des valeurs
                 hkm1=hₖ

@@ -6,9 +6,6 @@ function bissect_nwt(h :: AbstractLineFunction,
                     maxiter :: Int=50,
                     verbose :: Bool=false)
 
-        #nf=0
-        #nh=0
-        #ng=0
         if tₐ==tᵦ
           topt=tᵦ
           iter=0

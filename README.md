@@ -20,6 +20,8 @@ With [NLPModels](https://github.com/JuliaSmoothOptimizers/NLPModels.jl), [Scalar
 By default the Newton direction will be used.
 
 The output should be:
+
+
 `iter  t         gₖ          Δ        pred         ared`
 
 `   0 2.70e+00  -3.94e+00  1.00e+00 `

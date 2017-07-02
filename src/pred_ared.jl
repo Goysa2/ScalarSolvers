@@ -7,12 +7,14 @@ function pred_ared_computation(gₖ::Float64,
                                gtestTR::Float64;
                                seuil::Float64=-1e-10)
 
-  pred=gₖ*d+0.5*dersec*d^2
+  pred = gₖ * d + 0.5 * dersec * d^2
 
   if pred > seuil
-      ared = (gₖ + gtestTR)*d/2
+    #print_with_color(:yellow,"!!")
+    ared = (gₖ + gtestTR)*d/2
   else
-      ared = ftestTR-fₖ
+    #print_with_color(:green,"!!")
+    ared = ftestTR-fₖ
   end
 
   ratio=ared/pred

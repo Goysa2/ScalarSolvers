@@ -1,10 +1,10 @@
 export bissect_nwt
-function bissect_nwt(h :: AbstractLineFunction,
+function bissect_nwt(h :: AbstractLineFunction2,
                     tₐ :: Float64,
                     tᵦ :: Float64;
                     tol :: Float64=1e-7,
                     maxiter :: Int=50,
-                    verbose :: Bool=false)
+                    verbose :: Bool=false)   
 
         if tₐ==tᵦ
           topt=tᵦ
@@ -73,14 +73,9 @@ function bissect_nwt(h :: AbstractLineFunction,
               gₖ=gplus
               iter=iter+1
               verbose && @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n", iter,tₚ,t,dN,gₖ,gplus)
-              #verbose && println(" f=",nf," g=",ng," h=",nh)
-              #sleep(10)
             end
-                topt=t
-                return (topt,iter)
+    topt=t
+    return (topt,iter)
 
-        end
-
-
-
+  end
 end

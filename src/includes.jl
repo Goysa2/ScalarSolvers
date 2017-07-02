@@ -6,18 +6,13 @@ include("SecA_computation.jl")
 
 #include ARC methods
 include("ARC1D/ARC-Cub.jl")
-include("ARC1D/ARC-Nwt.jl")
-include("ARC1D/ARC-Sec.jl")
-include("ARC1D/ARC-SecA.jl")
 
 include("ARC1D/new_ARC_generic.jl")
 include("ARC1D/ARC_direction_computation.jl")
 
 #include Trust Region methods
 include("TR1D/TR-Cub.jl")
-include("TR1D/TR-Nwt.jl")
-include("TR1D/TR-Sec.jl")
-include("TR1D/TR-SecA.jl")
+
 
 include("TR1D/TR_direction_computation.jl")
 include("TR1D/new_TR_generic.jl")

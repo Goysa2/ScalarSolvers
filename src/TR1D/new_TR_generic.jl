@@ -66,7 +66,7 @@ function new_TR_generic(h :: AbstractLineFunction,
             if direction=="Sec"
               (t,fₖ,gₖ,s,y,secₖ)  =Sec_computation(t,gₖ,d,ftestTR,gtestTR)
             elseif direction=="SecA"
-              (t,fₖ,gₖ,s,y,secₖ)  =SecA_computation(t,gₖ,fₖ,d,ftestTR,gtestTR)
+              (t,fₖ,gₖ,secₖ)  =SecA_computation(t,gₖ,fₖ,d,ftestTR,gtestTR)
             elseif direction=="Nwt"
               (t,gₖ,fₖ,hₖ)=Nwt_computation(t,d,gtestTR,ftestTR,h)
               #println("après Nwt_computation (t,gₖ,fₖ,hₖ)=(",t,",",gₖ,",",fₖ,",",hₖ,")")

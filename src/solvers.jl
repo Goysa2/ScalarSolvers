@@ -4,17 +4,12 @@ all_solvers=[]
 
 #ARC methods
 push!(all_solvers,ARC_Cub)
-push!(all_solvers,ARC_Nwt)
-push!(all_solvers,ARC_Sec)
-push!(all_solvers,ARC_SecA)
 
 push!(all_solvers,new_ARC_generic)
 
 #TR methods
 push!(all_solvers,TR_Cub)
-push!(all_solvers,TR_Nwt)
-push!(all_solvers,TR_Sec)
-push!(all_solvers,TR_SecA)
+push!(all_solvers,new_TR_generic)
 
 #zoom methods
 push!(all_solvers,trouve_intervalleA)

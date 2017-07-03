@@ -1,16 +1,16 @@
 export new_ARC_generic
 function new_ARC_generic(h :: AbstractLineFunction2,
-                 t₀ :: Float64,
-                 tₘ :: Float64;
-                 tol :: Float64=1e-7,
-                 maxiter :: Int=50,
-                 verbose :: Bool=true,
-                 eps1 :: Float64=0.25,
-                 eps2 :: Float64=0.75,
-                 red :: Float64=0.2,
-                 aug :: Float64=5.0,
-                 Δ :: Float64=0.5,
-                 direction :: String="Nwt")
+                         t₀ :: Float64,
+                         tₘ :: Float64;
+                         tol :: Float64=1e-7,
+                         maxiter :: Int=50,
+                         verbose :: Bool=true,
+                         eps1 :: Float64=0.25,
+                         eps2 :: Float64=0.75,
+                         red :: Float64=0.2,
+                         aug :: Float64=5.0,
+                         Δ :: Float64=0.5,
+                         direction :: String="Nwt")
     t = t₀
 
     iter = 0;

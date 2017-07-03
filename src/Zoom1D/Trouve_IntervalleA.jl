@@ -1,5 +1,5 @@
 export trouve_intervalleA
-function trouve_intervalleA(h :: AbstractLineFunction,
+function trouve_intervalleA(h :: AbstractLineFunction2,
                             t₀ :: Float64,
                             tₘ :: Float64;
                             ϵ :: Float64=1e-10,

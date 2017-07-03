@@ -1,10 +1,10 @@
 export ARC_Cub
 function ARC_Cub(h :: AbstractLineFunction2,
-                t₀ :: Float64,
-                tₘ :: Float64;
-                tol :: Float64=1e-7,
-                maxiter :: Int=50,
-                verbose :: Bool=true)
+                 t₀ :: Float64,
+                 tₘ :: Float64;
+                 tol :: Float64=1e-7,
+                 maxiter :: Int=50,
+                 verbose :: Bool=true)
 
     #print("on entre dans ")
     # Trust region parameters

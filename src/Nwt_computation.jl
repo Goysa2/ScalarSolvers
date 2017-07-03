@@ -3,7 +3,7 @@ function Nwt_computation(t::Float64,
                          d::Float64,
                          gtestTR::Float64,
                          ftestTR::Float64,
-                         h::AbstractLineFunction)
+                         h::AbstractLineFunction2)
 
   t=t+d
   gₖ=gtestTR

@@ -1,10 +1,10 @@
 export bissect_secA
-function bissect_secA(h :: AbstractLineFunction,
-                    t0 :: Float64,
-                    t1 :: Float64;
-                    tol :: Float64=1e-7,
-                    maxiter :: Int=50,
-                    verbose :: Bool=false)
+function bissect_secA(h :: AbstractLineFunction2,
+                     t0 :: Float64,
+                     t1 :: Float64;
+                     tol :: Float64=1e-7,
+                     maxiter :: Int=50,
+                     verbose :: Bool=false)
 
         println("t0=",t0)
         println("t1=",t1)

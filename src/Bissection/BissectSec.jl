@@ -1,5 +1,5 @@
 export bissect_sec
-function bissect_sec(h :: AbstractLineFunction,
+function bissect_sec(h :: AbstractLineFunction2,
                      tₐ :: Float64,
                      tᵦ :: Float64;
                      tol :: Float64=1e-7,

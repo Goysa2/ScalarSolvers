@@ -1,8 +1,8 @@
 export trouve_intervalle
-function trouve_intervalle(h :: AbstractLineFunction,
-                t₀ :: Float64,
-                inc0 :: Float64;
-                verbose :: Bool=false)
+function trouve_intervalle(h :: AbstractLineFunction2,
+                           t₀ :: Float64,
+                           inc0 :: Float64;
+                           verbose :: Bool=false)
 
         iter=1
         h₀=obj(h,t₀)

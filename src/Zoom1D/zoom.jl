@@ -1,12 +1,12 @@
 export zoom
-function zoom(h :: AbstractLineFunction,
-                t₀ :: Float64,
-                t₁ :: Float64;
-                c₁ :: Float64=0.01,
-                tol :: Float64=1e-7,
-                ϵ :: Float64=1e-10,
-                maxiter :: Int=50,
-                verbose :: Bool=false)
+function zoom(h :: AbstractLineFunction2,
+              t₀ :: Float64,
+              t₁ :: Float64;
+              c₁ :: Float64=0.01,
+              tol :: Float64=1e-7,
+              ϵ :: Float64=1e-10,
+              maxiter :: Int=50,
+              verbose :: Bool=false)
 
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀

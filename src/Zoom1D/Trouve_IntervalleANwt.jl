@@ -1,11 +1,9 @@
 export trouve_intervalleANwt
-function trouve_intervalleANwt(h :: AbstractLineFunction,
+function trouve_intervalleANwt(h :: AbstractLineFunction2,
                                t₀ :: Float64,
                                tₘ :: Float64;
                                ϵ :: Float64=1e-10,
                                verbose :: Bool=false)
-
-        print_with_color(:magenta,"trouve_intervalleACub")
 
         h₀=obj(h,t₀)
         dh₀=grad(h,t₀)

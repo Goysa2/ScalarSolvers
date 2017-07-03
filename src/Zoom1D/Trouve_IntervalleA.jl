@@ -1,9 +1,9 @@
 export trouve_intervalleA
 function trouve_intervalleA(h :: AbstractLineFunction,
-                           t₀ :: Float64,
-                           tₘ :: Float64;
-                           ϵ :: Float64=1e-10,
-                           verbose :: Bool=false)
+                            t₀ :: Float64,
+                            tₘ :: Float64;
+                            ϵ :: Float64=1e-10,
+                            verbose :: Bool=false)
 
         tim1=t₀
         ti=(tim1+tₘ)/2

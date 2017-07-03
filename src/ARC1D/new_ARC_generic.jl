@@ -1,5 +1,5 @@
 export new_ARC_generic
-function new_ARC_generic(h :: AbstractLineFunction,
+function new_ARC_generic(h :: AbstractLineFunction2,
                  t₀ :: Float64,
                  tₘ :: Float64;
                  tol :: Float64=1e-7,

@@ -1,14 +1,13 @@
 export zoom_Sec
-function zoom_Sec(h :: AbstractLineFunction,
-                t₀ :: Float64,
-                t₁ :: Float64;
-                c₁ :: Float64=0.01,
-                tol :: Float64=1e-7,
-                ϵ :: Float64=1e-10,
-                maxiter :: Int=100,
-                verbose :: Bool=false)
-        print_with_color(:magenta,"zoom_Cub")
-
+function zoom_Sec(h :: AbstractLineFunction2,
+                  t₀ :: Float64,
+                  t₁ :: Float64;
+                  c₁ :: Float64=0.01,
+                  tol :: Float64=1e-7,
+                  ϵ :: Float64=1e-10,
+                  maxiter :: Int=100,
+                  verbose :: Bool=false)
+                  
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀
           th=t₁

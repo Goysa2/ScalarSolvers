@@ -1,5 +1,5 @@
 export ARC_Cub
-function ARC_Cub(h :: AbstractLineFunction,
+function ARC_Cub(h :: AbstractLineFunction2,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 tol :: Float64=1e-7,

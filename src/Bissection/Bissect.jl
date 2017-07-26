@@ -1,5 +1,5 @@
 export bissect
-function bissect(h :: AbstractLineFunction2,
+function bissect(h :: LineModel,
                 tₐ :: Float64,
                 tᵦ :: Float64;
                 tol :: Float64=1e-7,

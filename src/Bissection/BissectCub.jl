@@ -1,5 +1,5 @@
 export bissect_Cub
-function bissect_Cub(h :: AbstractLineFunction2,
+function bissect_Cub(h :: LineModel,
                     tₐ :: Float64,
                     tᵦ :: Float64;
                     tol :: Float64=1e-7,

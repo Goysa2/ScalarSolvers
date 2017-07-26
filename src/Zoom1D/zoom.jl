@@ -1,5 +1,5 @@
 export zoom
-function zoom(h :: AbstractLineFunction2,
+function zoom(h :: LineModel,
               t₀ :: Float64,
               t₁ :: Float64;
               c₁ :: Float64=0.01,

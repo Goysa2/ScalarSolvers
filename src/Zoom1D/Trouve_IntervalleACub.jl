@@ -1,5 +1,5 @@
 export trouve_intervalleACub
-function trouve_intervalleACub(h :: AbstractLineFunction2,
+function trouve_intervalleACub(h :: LineModel,
                 t₀ :: Float64,
                 tₘ :: Float64;
                 ϵ :: Float64=1e-10,

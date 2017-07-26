@@ -1,10 +1,10 @@
 export bissect_nwt
-function bissect_nwt(h :: AbstractLineFunction2,
+function bissect_nwt(h :: LineModel,
                     tₐ :: Float64,
                     tᵦ :: Float64;
                     tol :: Float64=1e-7,
                     maxiter :: Int=50,
-                    verbose :: Bool=false)   
+                    verbose :: Bool=false)
 
         if tₐ==tᵦ
           topt=tᵦ

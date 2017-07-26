@@ -1,5 +1,5 @@
 export new_TR_generic
-function new_TR_generic(h :: AbstractLineFunction2,
+function new_TR_generic(h :: LineModel,
                         t₀ :: Float64,
                         tₘ :: Float64;
                         tol :: Float64=1e-7,

@@ -1,5 +1,5 @@
 export TR_Cub
-function TR_Cub(h :: AbstractLineFunction2,
+function TR_Cub(h :: LineModel,
                t₀ :: Float64,
                tₘ :: Float64;
                 tol :: Float64=1e-7,

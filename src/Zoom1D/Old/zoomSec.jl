@@ -1,5 +1,5 @@
-export zoom_Nwt
-function zoom_Nwt(h :: LineModel,
+export zoom_Sec
+function zoom_Sec(h :: LineModel,
                   t₀ :: Float64,
                   t₁ :: Float64;
                   c₁ :: Float64=0.01,
@@ -51,45 +51,31 @@ function zoom_Nwt(h :: LineModel,
           end
           #hk=obj(h,t)
           if (hk>h₀+c₁*(t-t₀)*dh₀) || (hl<=hk)
-            if (hk>h₀+c₁*t*dh₀)
-              verbose && println("(hk>h₀+c₁*ti*dh₀)")
-            else
-              verbose && println("(hl<=hk)")
-            end
             th=t
-            tlast=th
-            hlast=hh
-            dhlast=dhh
             hh=hk
             dhh=gk
           else
-            verbose && verbose && println("else")
-            #gk=grad(h,t)
             if (abs(gk)<ϵ)
-              verbose && print(abs(gk),"<",-0.99*dh₀)
-              verbose && println("1er if dans le else zoom")
               topt=t
               iter=i
               return (topt,iter)
             elseif gk*(th-tl)>=0
-              verbose && println("elseif dans le else de zoom")
               th=tl
               hh=hl
               dhh=dhl
             end
             tl=t
-            tlast=tl
-            hlast=hl
-            dhlast=dhl
             hl=hk
             dhl=gk
           end
 
-          kₖ=hess(h,t)
-          dN=-gk/kₖ #direction de Newton
+          s = t-tqnp
+          y = gk-gkm1
 
-          if ((tp-t)*dN>0) & (dN/(tp-t)<γ)
-            tplus = t + dN
+          dS=-gk*s/y
+
+          if ((tp-t)*dS>0) & (dS/(tp-t)<γ)
+            tplus = t + dS
             hplus = obj(h, tplus)
             gplus = grad(h,tplus)
             verbose && println("N")
@@ -119,7 +105,6 @@ function zoom_Nwt(h :: LineModel,
               t=tplus
             end
           end
-
 
           #mise à jour des valeurs
           hkm1=hk

@@ -1,26 +1,28 @@
-export all_solvers
+export scalar_solvers
 
-all_solvers=[]
+scalar_solvers = []
 
 #ARC methods
-push!(all_solvers,ARC_Cub)
-
-push!(all_solvers,new_ARC_generic)
+push!(scalar_solvers, ARC_Cub)
+push!(scalar_solvers, ARC_Nwt)
+push!(scalar_solvers, ARC_Sec)
+push!(scalar_solvers, ARC_SecA)
 
 #TR methods
-push!(all_solvers,TR_Cub)
-push!(all_solvers,new_TR_generic)
+push!(scalar_solvers, TR_Cub)
+push!(scalar_solvers, TR_Nwt)
+push!(scalar_solvers, TR_Sec)
+push!(scalar_solvers, TR_SecA)
 
 #zoom methods
-push!(all_solvers,trouve_intervalleA)
-push!(all_solvers,trouve_intervalleACub)
-push!(all_solvers,trouve_intervalleANwt)
-push!(all_solvers,trouve_intervalleASec)
-push!(all_solvers,trouve_intervalleASecA)
+push!(scalar_solvers, zoom_Nwt)
+push!(scalar_solvers, zoom_Cub)
+push!(scalar_solvers, zoom_Sec)
+push!(scalar_solvers, zoom_SecA)
 
 #find interval and bissection methods
-push!(all_solvers,bissect)
-push!(all_solvers,bissect_Cub)
-push!(all_solvers,bissect_nwt)
-push!(all_solvers,bissect_sec)
-push!(all_solvers,bissect_secA)
+push!(scalar_solvers, bissect)
+push!(scalar_solvers, bissect_Cub)
+push!(scalar_solvers, bissect_nwt)
+push!(scalar_solvers, bissect_sec)
+push!(scalar_solvers, bissect_secA)

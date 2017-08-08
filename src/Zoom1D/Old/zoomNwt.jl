@@ -1,5 +1,5 @@
-export zoom_Cub
-function zoom_Cub(h :: LineModel,
+export zoom_Nwt
+function zoom_Nwt(h :: LineModel,
                   t₀ :: Float64,
                   t₁ :: Float64;
                   c₁ :: Float64=0.01,
@@ -39,63 +39,43 @@ function zoom_Cub(h :: LineModel,
         hkm1=obj(h,tqnp)
         gkm1=grad(h,tqnp)
 
-        verbose && println("on a les paramètre de zoom")
-
         verbose && @printf(" iter        tₗ        tₕ         t        hₗ        hₕ         hk         gk\n")
         verbose && @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n", i,tl,th,t,hl,hh,hk,gk)
 
 
         while ((i<maxiter) & (abs(gk)>tol)) || i==0
-          if i==0
-            verbose && println("on est dans le while de zoom")
-          end
-          #hk=obj(h,t)
+
           if (hk>h₀+c₁*(t-t₀)*dh₀) || (hl<=hk)
-            if (hk>h₀+c₁*t*dh₀)
-              verbose && println("(hk>h₀+c₁*ti*dh₀)")
-            else
-              verbose && println("(hl<=hk)")
-            end
             th=t
+            tlast=th
+            hlast=hh
+            dhlast=dhh
             hh=hk
             dhh=gk
           else
-            verbose && verbose && println("else")
             #gk=grad(h,t)
             if (abs(gk)<ϵ)
-              verbose && print(abs(gk),"<",-0.99*dh₀)
-              verbose && println("1er if dans le else zoom")
               topt=t
               iter=i
               return (topt,iter)
             elseif gk*(th-tl)>=0
-              verbose && println("elseif dans le else de zoom")
               th=tl
               hh=hl
               dhh=dhl
             end
             tl=t
+            tlast=tl
+            hlast=hl
+            dhlast=dhl
             hl=hk
             dhl=gk
           end
 
-          s = t-tqnp
-          y = gk-gkm1
+          kₖ=hess(h,t)
+          dN=-gk/kₖ #direction de Newton
 
-          α=-s
-          z=gk+gkm1+3*(hk-hkm1)/α
-          discr=z^2-gk*gkm1
-          denom=gk+gkm1+2*z
-          if (discr>0) & (abs(denom)>eps(Float64))
-            #si on peut on utilise l'interpolation cubique
-            w=sqrt(discr)
-            dC=-s*(gk+z+sign(α)*w)/(denom)
-          else #on se rabat sur une étape de sécante
-            dC=-gk*s/y
-          end
-
-          if ((tp-t)*dC>0) & (dC/(tp-t)<γ)
-            tplus = t + dC
+          if ((tp-t)*dN>0) & (dN/(tp-t)<γ)
+            tplus = t + dN
             hplus = obj(h, tplus)
             gplus = grad(h,tplus)
             verbose && println("N")
@@ -125,6 +105,7 @@ function zoom_Cub(h :: LineModel,
               t=tplus
             end
           end
+
 
           #mise à jour des valeurs
           hkm1=hk

@@ -1,12 +1,12 @@
-export zoom_SecA
-function zoom_SecA(h :: LineModel,
-                   t₀ :: Float64,
-                   t₁ :: Float64;
-                   c₁ :: Float64=0.01,
-                   tol :: Float64=1e-7,
-                   ϵ :: Float64=1e-10,
-                   maxiter :: Int=100,
-                   verbose :: Bool=false)
+export zoom_Cub
+function zoom_Cub(h :: LineModel,
+                  t₀ :: Float64,
+                  t₁ :: Float64;
+                  c₁ :: Float64=0.01,
+                  tol :: Float64=1e-7,
+                  ϵ :: Float64=1e-10,
+                  maxiter :: Int=100,
+                  verbose :: Bool=false)
 
         if obj(h,t₀)<obj(h,t₁)
           tl=t₀
@@ -46,30 +46,16 @@ function zoom_SecA(h :: LineModel,
 
 
         while ((i<maxiter) & (abs(gk)>tol)) || i==0
-          if i==0
-            verbose && println("on est dans le while de zoom")
-          end
-          #hk=obj(h,t)
           if (hk>h₀+c₁*(t-t₀)*dh₀) || (hl<=hk)
-            if (hk>h₀+c₁*t*dh₀)
-              verbose && println("(hk>h₀+c₁*ti*dh₀)")
-            else
-              verbose && println("(hl<=hk)")
-            end
             th=t
             hh=hk
             dhh=gk
           else
-            verbose && verbose && println("else")
-            #gk=grad(h,t)
             if (abs(gk)<ϵ)
-              verbose && print(abs(gk),"<",-0.99*dh₀)
-              verbose && println("1er if dans le else zoom")
               topt=t
               iter=i
               return (topt,iter)
             elseif gk*(th-tl)>=0
-              verbose && println("elseif dans le else de zoom")
               th=tl
               hh=hl
               dhh=dhl
@@ -82,17 +68,20 @@ function zoom_SecA(h :: LineModel,
           s = t-tqnp
           y = gk-gkm1
 
-          Γ=3*(gk+gkm1)*s-6*(hk-hkm1)
-          if y*s+Γ < eps(Float64)*(s^2)
-            yt=y
-          else
-            yt=y+Γ/s
+          α=-s
+          z=gk+gkm1+3*(hk-hkm1)/α
+          discr=z^2-gk*gkm1
+          denom=gk+gkm1+2*z
+          if (discr>0) & (abs(denom)>eps(Float64))
+            #si on peut on utilise l'interpolation cubique
+            w=sqrt(discr)
+            dC=-s*(gk+z+sign(α)*w)/(denom)
+          else #on se rabat sur une étape de sécante
+            dC=-gk*s/y
           end
 
-          dS=-gk*s/yt
-
-          if ((tp-t)*dS>0) & (dS/(tp-t)<γ)
-            tplus = t + dS
+          if ((tp-t)*dC>0) & (dC/(tp-t)<γ)
+            tplus = t + dC
             hplus = obj(h, tplus)
             gplus = grad(h,tplus)
             verbose && println("N")

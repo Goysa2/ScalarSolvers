@@ -1,21 +1,22 @@
 export trouve_intervalle
-function trouve_intervalle(h :: LineModel,
+function trouve_intervalle(h :: AbstractNLPModel,
                            t₀ :: Float64,
                            inc0 :: Float64;
                            verbose :: Bool = false)
 
         iter = 1
-        h₀ = obj(h, t₀)
-        g₀ = grad(h, t₀)
+        h₀ = obj(h, [t₀])[1]
+        g₀ = grad(h, [t₀])[1]
         sd = -sign(g₀)
         inc = inc0
         t₁ = t₀ + sd * inc
 
-        h₁ = obj(h, t₁)
-        g₁ = grad(h, t₁)
+        h₁ = obj(h, [t₁])[1]
+        g₁ = grad(h, [t₁])[1]
 
         verbose &&
             @printf("iter t₀        g₀        h₀         t₁        ")
+        verbose &&    
             @printf("g₀        h₀\n")
         verbose &&
             @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n",
@@ -27,8 +28,8 @@ function trouve_intervalle(h :: LineModel,
           h₀ = h₁
           g₀ = g₁
           t₁ = t₀ + sd * inc
-          h₁ = obj(h, t₁)
-          g₁ = grad(h, t₁)
+          h₁ = obj(h, [t₁])[1]
+          g₁ = grad(h, [t₁])[1]
           verbose && @printf("%4d %7.2e %7.2e  %7.2e  %7.2e  %7.2e  %7.2e \n",
                               iter,  t₀, g₀, h₀, t₁, g₀, h₀)
           iter = iter + 1
@@ -36,8 +37,8 @@ function trouve_intervalle(h :: LineModel,
 
         while (g₁ * sd < 0.0) & (iter < 30)
           tₘ = (t₁ + t₀) / 2
-          hₘ = obj(h, tₘ)
-          gₘ = grad(h, tₘ)
+          hₘ = obj(h, [tₘ])[1]
+          gₘ = grad(h, [tₘ])[1]
           if gₘ * sd>0
             t₁ = tₘ
             g₁ = gₘ

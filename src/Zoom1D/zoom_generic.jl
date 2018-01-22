@@ -1,6 +1,6 @@
 export zoom_generic
 
-function zoom_generic(h :: LineModel,
+function zoom_generic(h :: AbstractNLPModel,
                   	  t₀ :: Float64,
 	                  t₁ :: Float64;
 					  direction :: String = "Nwt",
@@ -9,24 +9,25 @@ function zoom_generic(h :: LineModel,
 	                  maxiter :: Int = 100,
 	                  verbose :: Bool = false,
 					  kwargs...)
-    if obj(h, t₀) < obj(h, t₁)
+    if obj(h, [t₀])[1] < obj(h, [t₁])[1]
     tl = t₀; th = t₁
     else
     tl = t₁; th = t₀
     end
 
-    hl = obj(h, tl); dhl = grad(h, tl)
-    hh = obj(h, th); dhh = grad(h, th)
-    h₀ = obj(h, t₀); dh₀ = grad(h, t₀)
+    hl = obj(h, [tl])[1]; dhl = grad(h, [tl])[1]
+    hh = obj(h, [th])[1]; dhh = grad(h, [th])[1]
+    h₀ = obj(h, [t₀])[1]; dh₀ = grad(h, [t₀])[1]
 
     γ = 0.8; t = t₁; tp = t₀; tqnp = t₀; hk = 0; hkm1 = 0; gkm1 = 0; hp = 0
     i = 0
 
-    hk = obj(h, t); gk = grad(h, t)
-    hkm1 = obj(h, tqnp); gkm1 = grad(h, tqnp)
+    hk = obj(h, [t])[1]; gk = grad(h, [t])[1]
+    hkm1 = obj(h, [tqnp])[1]; gkm1 = grad(h, [tqnp])[1]
 
     verbose &&
         @printf(" iter        tₗ        tₕ         t        hₗ        hₕ")
+    verbose &&
         @printf("         hk         gk\n")
     verbose &&
         @printf(" %7.2e %7.2e  %7.2e  %7.2e  %7.2e %7.2e %7.2e %7.2e\n",
@@ -49,7 +50,7 @@ function zoom_generic(h :: LineModel,
       dhlast = dhl; hl = hk; dhl = gk
     end
     if direction == "Nwt"
-        kₖ = hess(h, t)
+        kₖ = hess(h, [t])[1]
         dN = -gk/kₖ #direction de Newton
     elseif direction == "Sec"
         s = t - tqnp; y = gk - gkm1
@@ -77,11 +78,11 @@ function zoom_generic(h :: LineModel,
 
     if ((tp - t) * dN > 0) & (dN/(tp - t) < γ)
       tplus = t + dN
-      hplus = obj(h, tplus); gplus = grad(h, tplus)
+      hplus = obj(h, [tplus])[1]; gplus = grad(h, [tplus])[1]
       verbose && println("N")
     else
       tplus = (t + tp) / 2
-      hplus = obj(h, tplus); gplus = grad(h, tplus)
+      hplus = obj(h, [tplus])[1]; gplus = grad(h, [tplus])[1]
       verbose && println("B")
     end
 

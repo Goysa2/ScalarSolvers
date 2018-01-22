@@ -1,10 +1,8 @@
 export TR_Nwt
 
-function TR_Nwt(h :: LineModel,
-				t₀ :: Float64,
-				tₘ :: Float64;
+function TR_Nwt(h :: AbstractNLPModel;
 				kwargs...)
 
-	(t, iter) = TR_generic(h, t₀, tₘ; direction = "Nwt", kwargs...)
-	return (t, iter)
+	(t, f, opt_res, iter, optimality, tired, status, hf, hg,hh) = TR_generic(h; direction = "Nwt", kwargs...)
+	return (t, f, opt_res, iter, optimality, tired, status, hf, hg,hh)
 end

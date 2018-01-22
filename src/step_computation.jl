@@ -1,7 +1,7 @@
 export step_computation
 
 function step_computation(direction :: String,
-                          h :: LineModel,
+                          h :: AbstractNLPModel,
                           t :: Float64,
 						  d :: Float64,
 						  gₖ :: Float64,
@@ -10,7 +10,7 @@ function step_computation(direction :: String,
 						  gtestTR :: Float64)
 
   if direction == "Nwt"
-    t = t + d; fₖ = ftestTR; gₖ = gtestTR; H = hess(h, t)
+    t = t + d; fₖ = ftestTR; gₖ = gtestTR; H = hess(h, [t])[1]
     return (t, fₖ, gₖ, H)
   end
   if direction == "Sec"

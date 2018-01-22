@@ -1,10 +1,8 @@
 export zoom_SecA
 
-function zoom_SecA(h :: LineModel,
-				  t₀ :: Float64,
-				  tₘ :: Float64;
+function zoom_SecA(h :: AbstractNLPModel;
 				  kwargs...)
 
-	(topt, iter) = trouve_intervalleA(h, t₀, tₘ; direction = "SecA", kwargs...)
-	return (topt, iter)
+	(t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess) = trouve_intervalleA(h; direction = "SecA", kwargs...)
+	return (t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

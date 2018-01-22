@@ -5,17 +5,17 @@ function TR_step_computation(h :: Float64,
                              dN :: Float64,
                              Δ :: Float64)
 
-  if h>0
-    if g>0
-      d=max(-Δ,dN)
+  if h > 0.0
+    if g > 0.0
+      d = max(-Δ, dN)
     else
-      d=min(dN,Δ)
+      d = min(dN, Δ)
     end
   else
-    if g>0
-      d=-Δ
+    if g > 0.0
+      d = -Δ
     else
-      d=Δ
+      d = Δ
     end
   end
 

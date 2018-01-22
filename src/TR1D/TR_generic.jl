@@ -5,7 +5,7 @@ export TR_generic
 # If q is a good approximation of h then we move towards the minimizer of q
 # Otherwise we reduce our Trust region interval (Δ) until we have a good
 # approximation.
-# q(d) = h(t) + h'(t) * d + 0.5 * h''(t) * d² 
+# q(d) = h(t) + h'(t) * d + 0.5 * h''(t) * d²
 #
 # Specific key word arguments
 # eps1 :: Float64. Below that treshold we don't move and reduce Δ.
@@ -16,9 +16,9 @@ export TR_generic
 # aug :: Float64. Rate at which we augment Δ if we have a bad approximation
 # Δ :: Float64. Size of the trust region at the begining of the algorithm.
 
-function TR_generic(h :: LineModel,
-                    t₀ :: Float64,
-                    tₘ :: Float64;
+function TR_generic(h :: AbstractNLPModel;
+                    t₀ :: Float64 = -10.0,
+                    tₘ :: Float64 = 100.0,
                     tol :: Float64 = 1e-7,
                     maxiter :: Int = 50,
                     verbose :: Bool = true,
@@ -30,19 +30,19 @@ function TR_generic(h :: LineModel,
                     direction :: String = "Nwt")
 
     t = t₀; iter = 0; # Establish starting point and iteration counter.
-    fₖ = obj(h, t)
-    gₖ = grad(h, t)
+    fₖ = obj(h, [t])[1]
+    gₖ = grad(h, [t])[1]
 
     # H denotes the (approximation of the) second derivative
     if direction == "Sec" || direction == "SecA"
       H = 1.0
     else
-      H = hess(h, t)
+      H = hess(h, [t])[1]
     end
 
     verbose &&
         @printf(" iter  t         gₖ          Δ        pred         ared\n")
-    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t, gₖ, Δ)
+    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t, gₖ[1], Δ)
 
     # We loop until we have a minimizer or we have reached the maximum number of
     # iterations.
@@ -52,8 +52,8 @@ function TR_generic(h :: LineModel,
         d = TR_step_computation(H, gₖ, dN, Δ) # determines the right direction
                                               # depending on our trust region
         # Numerical reduction computation
-        ftestTR = obj(h, t + d)        # Value of h and h' at t + d
-        gtestTR = grad(h, t + d)
+        ftestTR = obj(h, [t + d])[1]        # Value of h and h' at t + d
+        gtestTR = grad(h, [t + d])[1]
 
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
@@ -79,5 +79,17 @@ function TR_generic(h :: LineModel,
                            iter, t, gₖ, Δ, pred, ared)
     end
 
-    return (t, iter)
+    if maxiter <= iter
+        tired = true
+    else
+        tired = false
+    end
+    if (abs(gₖ) > tol)
+        optimal = false
+    else
+        optimal = true
+    end
+    status = :tmp
+
+    return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

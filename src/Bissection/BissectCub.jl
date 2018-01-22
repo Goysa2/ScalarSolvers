@@ -1,19 +1,19 @@
 export bissect_Cub
-function bissect_Cub(h :: LineModel,
-                    t1 :: Float64,
-                    t2 :: Float64;
+function bissect_Cub(h :: AbstractNLPModel;
+                    t1 :: Float64 = -10.0,
+                    t2 :: Float64 = 100.0,
                     tol :: Float64 = 1e-7,
                     maxiter :: Int = 50,
                     verbose :: Bool = false)
 
-  (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)               
+  (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)
 
   γ = 0.8; t = tᵦ; tₚ = tₐ; tqnp = tₐ
   hₖ = 0; hkm1 = 0; gkm1 = 0; hₚ = 0
   iter = 0
 
-  hₖ = obj(h, t); gₖ = grad(h, t)
-  hkm1 = obj(h, tqnp); gkm1 = grad(h, tqnp)
+  hₖ = obj(h, [t])[1]; gₖ = grad(h, [t])[1]
+  hkm1 = obj(h, [tqnp])[1]; gkm1 = grad(h, [tqnp])[1]
 
   verbose &&
     @printf(" iter        tₚ        t         dN         ")
@@ -37,13 +37,13 @@ function bissect_Cub(h :: LineModel,
 
     if ((tₚ - t) * dN > 0.0) & (dN / (tₚ - t) < γ)
       tplus = t + dN
-      hplus = obj(h, tplus)
-      gplus = grad(h, tplus)
+      hplus = obj(h, [tplus])[1]
+      gplus = grad(h, [tplus])[1]
       verbose && println("N")
     else
       tplus = (t + tₚ) / 2
-      hplus = obj(h, tplus)
-      gplus = grad(h, tplus)
+      hplus = obj(h, [tplus])[1]
+      gplus = grad(h, [tplus])[1]
       verbose && println("B")
     end
 
@@ -70,6 +70,18 @@ function bissect_Cub(h :: LineModel,
   end
 
   topt = t
-  return (topt, iter)
+  gopt = grad(h, [topt])[1]
+  if maxiter <= iter
+      tired = true
+  else
+      tired = false
+  end
+  if (abs(gopt) > tol)
+      optimal = false
+  else
+      optimal = true
+  end
+  status = :tmp
+  return (topt, obj(h, [topt])[1], norm(gopt, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 
 end # function

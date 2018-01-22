@@ -1,10 +1,8 @@
 export TR_Sec
 
-function TR_Sec(h :: LineModel,
-				t₀ :: Float64,
-				tₘ :: Float64;
+function TR_Sec(h :: AbstractNLPModel;
 				kwargs...)
 
-	(t, iter) = TR_generic(h, t₀, tₘ; direction = "Sec", kwargs...)
-	return (t, iter)
+	(t, f, opt_res, iter, optimality, tired, status, hf, hg,hh) = TR_generic(h; direction = "Sec", kwargs...)
+	return (t, f, opt_res, iter, optimality, tired, status, hf, hg,hh)
 end

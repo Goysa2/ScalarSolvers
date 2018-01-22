@@ -16,9 +16,9 @@ export ARC_generic
 # aug :: Float64. Rate at which we augment Δ if we have a bad approximation
 # Δ :: Float64. Size of the trust region at the begining of the algorithm.
 
-function ARC_generic(h :: LineModel,
-                     t₀ :: Float64,
-                     tₘ :: Float64;
+function ARC_generic(h :: AbstractNLPModel;
+                     t₀ :: Float64 = -10.0,
+                     tₘ :: Float64 = 100.0,
                      tol :: Float64 = 1e-7,
                      maxiter :: Int = 50,
                      verbose :: Bool = true,
@@ -30,11 +30,12 @@ function ARC_generic(h :: LineModel,
                      direction :: String = "Nwt")
 
     t = t₀; iter = 0;                # We establish our starting point t
-    fₖ = obj(h, t); gₖ = grad(h, t); # And h(t) and h''(t)
+    fₖ = obj(h, [t])[1]; gₖ = grad(h, [t])[1]; # And h(t) and h''(t)
+
 
     # H denotes the (approximation of the) second derivative
     if direction == "Nwt"
-      H = hess(h, t)
+      H = hess(h, [t])[1]
     elseif direction == "Sec" || direction == "SecA"
       H = 1.0
     end
@@ -44,7 +45,7 @@ function ARC_generic(h :: LineModel,
     verbose &&
         @printf(" iter  t         gₖ          Δ        pred         ared\n")
     verbose &&
-        @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t, gₖ, Δ)
+        @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t, gₖ[1], Δ)
     # We loop until we have a minimizer or we have reached the maximum number of
     # iterations.
     while ((abs(gₖ) > tol) & (iter < maxiter)) | (iter == 0)
@@ -52,8 +53,8 @@ function ARC_generic(h :: LineModel,
         d = ARC_step_computation(H, gₖ, Δ) # We find the direction in which we
                                            # move
         # Numerical reduction computation
-        ftestTR = obj(h, t + d)  # Value of h and h' at t + d
-        gtestTR = grad(h, t + d)
+        ftestTR = obj(h, [t + d])[1]  # Value of h and h' at t + d
+        gtestTR = grad(h, [t + d])[1]
 
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
@@ -70,15 +71,26 @@ function ARC_generic(h :: LineModel,
 
             if ratio > eps2
                 # Very good approximation of h. We reduce the importance of the
-                # cubic term. 
+                # cubic term.
                 Δ = aug * Δ
             end
         end
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n",
-                            iter, t, gₖ, Δ, pred, ared)
+                            iter, t, gₖ[1], Δ, pred, ared)
     end
 
-    return (t, iter)
+    if maxiter <= iter
+        tired = true
+    else
+        tired = false
+    end
+    if (abs(gₖ[1]) > tol)
+        optimal = false
+    else
+        optimal = true
+    end
+    status = :tmp
+    return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

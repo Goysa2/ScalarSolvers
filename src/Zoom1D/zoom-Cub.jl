@@ -1,10 +1,7 @@
 export zoom_Cub
 
-function zoom_Cub(h :: LineModel,
-				  t₀ :: Float64,
-				  tₘ :: Float64;
+function zoom_Cub(h :: AbstractNLPModel;
 				  kwargs...)
-
-	(topt, iter) = trouve_intervalleA(h, t₀, tₘ; direction = "Cub", kwargs...)
-	return (topt, iter)
+	(t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess) = trouve_intervalleA(h; direction = "Cub", kwargs...)
+	return (t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

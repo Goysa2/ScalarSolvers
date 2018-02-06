@@ -1,26 +1,23 @@
 export TR_Cub
 function TR_Cub(h :: AbstractNLPModel;
-               t₀ :: Float64 = -10.0,
-               tₘ :: Float64 = 100.0,
-                tol :: Float64 = 1e-7,
-                maxiter :: Int = 50,
-                verbose :: Bool = true,
-                eps1 ::Float64 = 0.2,
-                eps2 :: Float64 = 0.8,
-                red :: Float64 = 0.5,
-                aug :: Float64 = 2.0,
-                Δ :: Float64 = 1.0)
+               t₀ :: Float64 = h.meta.x0[1],
+               tol :: Float64 = 1e-7,
+               maxiter :: Int = 50,
+               verbose :: Bool = true,
+               eps1 ::Float64 = 0.2,
+               eps2 :: Float64 = 0.8,
+               red :: Float64 = 0.5,
+               aug :: Float64 = 2.0,
+               Δ :: Float64 = 1.0)
 
-    t = t₀
-
-    iter = 0;
+    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
+    t = t₀; iter = 0;
     fₖ = obj(h, [t])[1]
     gₖ = grad(h, [t])[1]
 
     secₖ = 1.0
-    dN=-gₖ #pour la première itération
-    A=0.5
-    B=0.0
+    dN = -gₖ #pour la première itération
+    A = 0.5; B = 0.0
 
     q(d) = fₖ + gₖ * d + A * d^2 + B * d^3
 
@@ -76,17 +73,11 @@ function TR_Cub(h :: AbstractNLPModel;
             Δ = red * Δ
         else
           #two points memory
-          tpred = t
-          gkm1 = gₖ
-          fkm1 = fₖ
-
-          t = t + d
-          gₖ = gtestTR
-          fₖ = ftestTR
+          tpred = t; gkm1 = gₖ; fkm1 = fₖ
+          t = t + d; gₖ = gtestTR; fₖ = ftestTR
 
           #cubic two points interpolation
-          s = t - tpred
-          y = gₖ - gkm1
+          s = t - tpred; y = gₖ - gkm1
 
           α = -s
           z = gₖ + gkm1 + 3 * (fₖ - fkm1) / α
@@ -104,17 +95,11 @@ function TR_Cub(h :: AbstractNLPModel;
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
     end
 
-    if maxiter <= iter
-        tired = true
-    else
-        tired = false
-    end
-    if (abs(gₖ[1]) > tol)
-        optimal = false
-    else
-        optimal = true
-    end
-    status = :tmp
+    status = :NotSolved
+    (abs(gₖ) < tol) && (status = :Optimal)
+    (iter >= maxiter) && (status = :Tired)
+    tired = iter > maxiter
+    optimal = abs(gₖ) < tol
     return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 
 end

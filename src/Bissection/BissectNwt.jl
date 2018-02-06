@@ -1,11 +1,12 @@
 export bissect_nwt
 function bissect_nwt(h :: AbstractNLPModel;
-                    t1 :: Float64 = -10.0,
+                    t1 :: Float64 = h.meta.x0[1],
                     t2 :: Float64 = 100.0,
                     tol :: Float64 = 1e-7,
                     maxiter :: Int = 50,
                     verbose :: Bool = false)
 
+    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
   (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)
   γ = 0.8; t = tᵦ; tₚ = tₐ; tqnp = tₐ
   hₖ = 0; hkm1 = 0; gkm1 = 0; hplus = 0
@@ -60,16 +61,10 @@ function bissect_nwt(h :: AbstractNLPModel;
                 iter, tₚ, t, dN, gₖ, gplus)
     end
   topt = t
-  if maxiter <= iter
-      tired = true
-  else
-      tired = false
-  end
-  if (abs(gₖ[1]) > tol)
-      optimal = false
-  else
-      optimal = true
-  end
-  status = :tmp
+  status = :NotSolved
+  (abs(gₖ) < tol) && (status = :Optimal)
+  (iter >= maxiter) && (status = :Tired)
+  tired = iter > maxiter
+  optimal = abs(gₖ) < tol
   return (topt, obj(h, [topt])[1], norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

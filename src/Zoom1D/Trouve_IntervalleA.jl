@@ -1,9 +1,9 @@
 export trouve_intervalleA
 function trouve_intervalleA(h :: AbstractNLPModel;
-                            t₀ :: Float64 = -10.0,
+                            t₀ :: Float64 = h.meta.x0[1],
                             tₘ :: Float64 = 100.0,
                             direction :: String  =  "Nwt",
-                            ϵ :: Float64 = 1e-10,
+                            tol :: Float64 = 1e-10,
                             verbose :: Bool = false,
                             kwargs...)
         # println("on est dans trouve_intervalleA")
@@ -32,70 +32,42 @@ function trouve_intervalleA(h :: AbstractNLPModel;
           him1 = hi
           hi = obj(h, [ti])[1]
           if (hi > h₀) ||((hi  > him1) && (i > 1))
-            # println("avant zoom_generic 1")
             (topt, iter) = zoom_generic(h, tim1, ti;
                                         direction = direction,
                                         verbose = verbose)
-            # println("après zoom_generic 1")
             gopt = grad(h, [topt])[1]
-            if 50 <= i
-                tired = true
-            else
-                tired = false
-            end
-            if (abs(gopt) > 1e-7)
-                optimal = false
-            else
-                optimal = true
-            end
-            status = :tmp
-            # print_with_color(:yellow, "ici  \n")
-            # println("avant le return 1")
+            status = :NotSolved
+            (abs(gopt) < 1e-07) && (status = :Optimal)
+            (i >= 50) && (status = :Tired)
+            tired = i > 50
+            optimal = abs(gopt) < 1e-07
             return (topt, obj(h, [topt])[1], norm(gopt, Inf), i, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
           end
 
           dhim1 = dhi
           dhi = grad(h, [ti])[1]
-          if (abs(dhi) <= ϵ)
+          if (abs(dhi) <= tol)
             iter = i
             topt = ti
             gopt = grad(h, [topt])[1]
-            if 50 <= i
-                tired = true
-            else
-                tired = false
-            end
-            if (abs(gopt) > 1e-7)
-                optimal = false
-            else
-                optimal = true
-            end
-            status = :tmp
-            # print_with_color(:yellow, "ici  \n")
-            # println("avant le return 2")
+            status = :NotSolved
+            (abs(gopt) < 1e-07) && (status = :Optimal)
+            (i >= 50) && (status = :Tired)
+            tired = i > 50
+            optimal = abs(gopt) < 1e-07
             return (topt, obj(h, [topt])[1], norm(gopt, Inf), i, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
           end
 
           if (dhi >= 0.0)
-              # println("avant zoom_generic 2")
             (topt, iter) = zoom_generic(h, ti, tim1,
                                         verbose = verbose,
                                         direction = direction)
-            # println("après zoom_generic 2")
             gopt = grad(h, [topt])[1]
-            if 50 <= i
-                tired = true
-            else
-                tired = false
-            end
-            if (abs(gopt) > 1e-7)
-                optimal = false
-            else
-                optimal = true
-            end
-            status = :tmp
-            # print_with_color(:yellow, "ici  \n")
-            # println("avant le return 3")
+            status = :NotSolved
+            (abs(gopt) < 1e-07) && (status = :Optimal)
+            (i >= 50) && (status = :Tired)
+            tired = i > 50
+            optimal = abs(gopt) < 1e-07
             return (topt, obj(h, [topt])[1], norm(gopt, Inf), i, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 
           end

@@ -5,7 +5,6 @@ function zoom_generic(h :: AbstractNLPModel,
 	                  t₁ :: Float64;
 					  direction :: String = "Nwt",
 	                  tol :: Float64 = 1e-7,
-	                  ϵ :: Float64 = 1e-10,
 	                  maxiter :: Int = 100,
 	                  verbose :: Bool = false,
 					  kwargs...)
@@ -40,7 +39,7 @@ function zoom_generic(h :: AbstractNLPModel,
       th = t; tlast = th; hlast = hh
       dhlast = dhh; hh = hk; dhh = gk
     else
-      if (abs(gk) < ϵ)
+      if (abs(gk) < tol)
         topt = t; iter = i
         return (topt, iter)
       elseif gk * (th - tl) >= 0

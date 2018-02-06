@@ -1,11 +1,13 @@
 export bissect_Cub
 function bissect_Cub(h :: AbstractNLPModel;
-                    t1 :: Float64 = -10.0,
+                    t1 :: Float64 = h.meta.x0[1],
                     t2 :: Float64 = 100.0,
                     tol :: Float64 = 1e-7,
                     maxiter :: Int = 50,
                     verbose :: Bool = false)
 
+
+    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
   (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)
 
   γ = 0.8; t = tᵦ; tₚ = tₐ; tqnp = tₐ
@@ -71,17 +73,11 @@ function bissect_Cub(h :: AbstractNLPModel;
 
   topt = t
   gopt = grad(h, [topt])[1]
-  if maxiter <= iter
-      tired = true
-  else
-      tired = false
-  end
-  if (abs(gopt) > tol)
-      optimal = false
-  else
-      optimal = true
-  end
-  status = :tmp
+  status = :NotSolved
+  (abs(gopt) < tol) && (status = :Optimal)
+  (iter >= maxiter) && (status = :Tired)
+  tired = iter > maxiter
+  optimal = abs(gopt) < tol
   return (topt, obj(h, [topt])[1], norm(gopt, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 
 end # function

@@ -17,8 +17,7 @@ export ARC_generic
 # Δ :: Float64. Size of the trust region at the begining of the algorithm.
 
 function ARC_generic(h :: AbstractNLPModel;
-                     t₀ :: Float64 = -10.0,
-                     tₘ :: Float64 = 100.0,
+                     t₀ :: Float64 = h.meta.x0[1],
                      tol :: Float64 = 1e-7,
                      maxiter :: Int = 50,
                      verbose :: Bool = true,
@@ -29,6 +28,7 @@ function ARC_generic(h :: AbstractNLPModel;
                      Δ :: Float64 = 0.5,
                      direction :: String = "Nwt")
 
+    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
     t = t₀; iter = 0;                # We establish our starting point t
     fₖ = obj(h, [t])[1]; gₖ = grad(h, [t])[1]; # And h(t) and h''(t)
 
@@ -81,16 +81,10 @@ function ARC_generic(h :: AbstractNLPModel;
                             iter, t, gₖ[1], Δ, pred, ared)
     end
 
-    if maxiter <= iter
-        tired = true
-    else
-        tired = false
-    end
-    if (abs(gₖ[1]) > tol)
-        optimal = false
-    else
-        optimal = true
-    end
-    status = :tmp
+    status = :NotSolved
+    (abs(gₖ) < tol) && (status = :Optimal)
+    (iter >= maxiter) && (status = :Tired)
+    tired = iter > maxiter
+    optimal = abs(gₖ) < tol
     return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

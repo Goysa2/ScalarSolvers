@@ -2,8 +2,11 @@ module ScalarSolvers
 
 using JuMP
 using NLPModels
-using Optimize, LSDescentMethods
-using Polynomials
+using LinearAlgebra
+using Printf
+using State, Stopping
+# using Optimize, LSDescentMethods
+# using Polynomials
 
 include("includes.jl")
 

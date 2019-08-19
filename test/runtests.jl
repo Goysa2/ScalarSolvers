@@ -9,7 +9,8 @@ nlp1 = MathProgNLPModel(AMPGO02());
 TR_Nwt(nlp1, verbose = true)
 
 nlp2 = MathProgNLPModel(AMPGO02());
-nlp_at_x = NLPAtX(2.7)
+nlp_at_x = NLPAtX([2.7])
+stop_meta = StoppingMeta(max_iter = 5)
 nlp_stop = NLPStopping(nlp2, Stopping.unconstrained, nlp_at_x)
 TR_Nwt_Stop(nlp2, nlp_stop, verbose = true)
 

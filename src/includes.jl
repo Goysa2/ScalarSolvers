@@ -2,6 +2,9 @@
 include("pred_ared.jl")
 include("step_computation.jl")
 
+include("pred_ared_stop.jl")
+include("step_computation_stop.jl")
+
 # # include ARC methods
 # include("ARC1D/ARC-Cub.jl")
 # include("ARC1D/ARC-Nwt.jl")
@@ -21,6 +24,8 @@ include("TR1D/TR-Nwt-Stop.jl")
 include("TR1D/TR_direction_computation.jl")
 include("TR1D/TR_generic.jl")
 include("TR1D/TR_generic_Stop.jl")
+
+include("TR1D/TR_direction_computation_Stop.jl")
 #
 # # include zoom
 # include("Zoom1D/Trouve_IntervalleA.jl")

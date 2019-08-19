@@ -50,7 +50,7 @@ function TR_generic(h :: AbstractNLPModel;
 
         dN = -gₖ / H;                 # (approximation of the) Newton direction
         d = TR_step_computation(H, gₖ, dN, Δ) # determines the right direction
-                                              # depending on our trust region
+                                              # depending on our trust region                                      
         # Numerical reduction computation
         ftestTR = obj(h, [t + d])[1]        # Value of h and h' at t + d
         gtestTR = grad(h, [t + d])[1]

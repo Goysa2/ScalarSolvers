@@ -25,58 +25,46 @@ function TR_generic_Stop(h :: AbstractNLPModel,
                          aug :: Float64 = 2.0,
                          Δ :: Float64 = 1.0,
                          direction :: Symbol = :Nwt)
-
+    Δ = [Δ]
     (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
     t = h.meta.x0; iter = 0; # Establish starting point and iteration counter.
     fₖ = obj(h, t)
     f₀ = copy(fₖ)
     gₖ = grad(h, t)
     g₀ = copy(gₖ)
-    printstyled("on a f et g \n", color = :green)
 
     # H denotes the (approximation of the) second derivative
-    if direction == "Sec" || direction == "SecA"
+    if direction == :Sec || direction == :SecA
       H = [1.0]
     else
       H = hess(h, t)
     end
 
     OK = update_and_start!(nlpstop, x = t, fx = fₖ, gx = gₖ, g0 = g₀, Hx = H)
-    @show OK
-
 
     verbose && @printf(" iter  t         gₖ          Δ        pred         ared\n")
-    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t[1], gₖ[1], Δ)
+    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t[1], gₖ[1], Δ[1])
 
     # We loop until we have a minimizer or we have reached the maximum number of
     # iterations.
     while !OK
-
         dN = -gₖ ./ H;                 # (approximation of the) Newton direction
-        # @show dN
         d = TR_step_computation_stop(H, gₖ, dN, Δ) # determines the right direction
                                               # depending on our trust region
-        # printstyled("on a d = $d \n", color = :red)
-        # @show t
-        # @show d
+
         # Numerical reduction computation
         ftestTR = obj(h, t + d)        # Value of h and h' at t + d
         gtestTR = grad(h, t + d)
-        # @show ftestTR
-        # @show gtestTR
 
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
         (pred, ared, ratio) =
             pred_ared_computation_stop(gₖ, fₖ, H, d, ftestTR, gtestTR)
-        # printstyled("une fois calculé \n", color = :bold)
-        # @show pred
-        # @show ared
-        # @show ratio
 
-        if (ratio .< eps1) && (abs.(d) == Δ)
+        if (ratio .< eps1) &&  (true in (abs.(d) .== Δ))
             # Bad approximation of h. Reduction of the size of the trust region
             Δ = red * Δ
+            # printstyled("on a reduit delta \n", color = :red)
         else
             # Good approximation we move towards the minimizer of q
             (t, fₖ, gₖ, H) =
@@ -86,19 +74,17 @@ function TR_generic_Stop(h :: AbstractNLPModel,
                 # Very good approximation of h. We increase our trust region.
                 Δ = aug * Δ
             end
+            OK = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, Hx = H)
         end
 
-        OK = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, Hx = H)
+        # OK = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, Hx = H)
+        # @show OK
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n",
-                           iter, t[1], gₖ[1], Δ, pred, ared)
+                           iter, t[1], gₖ[1], Δ[1], pred, ared)
     end
 
-    status = :NotSolved
-    OK && (status = :Optimal)
-    # (iter >= maxiter) && (status = :Tired)
-    # tired = iter > maxiter
     optimal = OK #abs(gₖ) < tol
-    return (t, fₖ, norm(gₖ, Inf), iter, optimal, false, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
+    return optimal, nlpstop
 end

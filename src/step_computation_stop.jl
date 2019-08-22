@@ -1,17 +1,10 @@
 export step_computation_stop
 
-# function step_computation(direction :: Symbol,
-#                           h :: AbstractNLPModel,
-#                           t :: Float64,
-# 						  d :: Float64,
-# 						  gₖ :: Float64,
-# 						  fₖ :: Float64,
-# 						  ftestTR :: Float64,
-# 						  gtestTR :: Float64)
-
 function step_computation_stop(direction :: Symbol,
-                          h :: AbstractNLPModel,
-                          t, d, gₖ, fₖ, ftestTR, gtestTR)
+                               h :: AbstractNLPModel,
+                               t, d, gₖ, fₖ, ftestTR, gtestTR)
+
+  T = eltype(t)
 
   if direction == :Nwt
     t = t + d; fₖ = ftestTR; gₖ = gtestTR; H = hess(h, t)
@@ -24,15 +17,15 @@ function step_computation_stop(direction :: Symbol,
   end
   if direction == :SecA
 	tpred = t; gkm1 = gₖ; fkm1 = fₖ
-	t = t + d; gₖ = gtestTR; fₖ = ftestTR
- 	s = t - tpred; y = gₖ - gkm1
-	Γ = 3 * (gₖ + gkm1) * s - 6 * (fₖ - fkm1)
-	if (y * s + Γ) < eps(Float64) * (s^2) #correction trop petite
+	t = t .+ d; gₖ = gtestTR; fₖ = ftestTR
+ 	s = t .- tpred; y = gₖ .- gkm1
+	Γ = 3 .* (gₖ .+ gkm1) .* s .- 6 .* (fₖ .- fkm1)
+	if (y .* s .+ Γ) < eps(T) .* (s .^ 2) #correction trop petite
 	  yt = y
 	else
-	  yt = y + Γ / s
+	  yt = y .+ Γ ./ s
 	end
-	secₖ = yt / s
+	secₖ = yt ./ s
   	return (t, fₖ, gₖ, secₖ)
   end
 end

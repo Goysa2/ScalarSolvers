@@ -47,30 +47,49 @@ function TR_generic(h :: AbstractNLPModel;
     # We loop until we have a minimizer or we have reached the maximum number of
     # iterations.
     while ((abs(gₖ) > tol) && (iter < maxiter)) || (iter == 0)
-
+        # @show gₖ
+        # @show H
         dN = -gₖ / H;                 # (approximation of the) Newton direction
+        # @show dN
         d = TR_step_computation(H, gₖ, dN, Δ) # determines the right direction
-                                              # depending on our trust region                                      
+
+        # @show t                                      # depending on our trust region
+        # @show d
+        # @show t + d
+        # @show [t + d]
         # Numerical reduction computation
         ftestTR = obj(h, [t + d])[1]        # Value of h and h' at t + d
         gtestTR = grad(h, [t + d])[1]
+        # @show ftestTR
+        # @show gtestTR
 
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
         (pred, ared, ratio) =
             pred_ared_computation(gₖ, fₖ, H, d, ftestTR, gtestTR)
-
+        # @show pred
+        # @show ared
+        # @show ratio
+        # @show eps1
+        # @show abs(d)
+        # @show Δ
         if (ratio < eps1) && (abs(d) == Δ)
             # Bad approximation of h. Reduction of the size of the trust region
             Δ = red * Δ
+            # printstyled("on a reduit delta \n", color = :red)
         else
             # Good approximation we move towards the minimizer of q
             (t, fₖ, gₖ, H) =
                 step_computation(direction, h, t, d, gₖ, fₖ, ftestTR, gtestTR)
-
+            # printstyled("après step computation \n", color = :red)
+            # @show t
+            # @show fₖ
+            # @show gₖ
+            # @show H
             if ratio > eps2
                 # Very good approximation of h. We increase our trust region.
                 Δ = aug * Δ
+                # printstyled("on a augmente delta \n", color = :red)
             end
         end
 

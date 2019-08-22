@@ -8,16 +8,21 @@ include("step_computation_stop.jl")
 # # include ARC methods
 # include("ARC1D/ARC-Cub.jl")
 # include("ARC1D/ARC-Nwt.jl")
+include("ARC1D/ARC-Nwt-Stop.jl")
 # include("ARC1D/ARC-Sec.jl")
 # include("ARC1D/ARC-SecA.jl")
 #
 # include("ARC1D/ARC_generic.jl")
 # include("ARC1D/ARC_direction_computation.jl")
+include("ARC1D/ARC_generic_Stop.jl")
+include("ARC1D/ARC_direction_computation_stop.jl")
 
 # include Trust Region methods
 # include("TR1D/TR-Cub.jl")
 include("TR1D/TR-Nwt.jl")
 include("TR1D/TR-Nwt-Stop.jl")
+include("TR1D/TR-Sec-Stop.jl")
+include("TR1D/TR-SecA-Stop.jl")
 # include("TR1D/TR-Sec.jl")
 # include("TR1D/TR-SecA.jl")
 

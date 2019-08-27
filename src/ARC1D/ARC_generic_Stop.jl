@@ -56,6 +56,8 @@ function ARC_generic_stop(h         :: AbstractNLPModel,
 
         d = ARC_step_computation_stop(H, gₖ, Δ) # We find the direction in which we
                                                 # move
+        # @show t
+        # @show d
         # Numerical reduction computation
         ftestTR = obj(h, t + d)  # Value of h and h' at t + d
         gtestTR = grad(h, t + d)
@@ -63,7 +65,7 @@ function ARC_generic_stop(h         :: AbstractNLPModel,
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
         (pred, ared, ratio) =
-            pred_ared_computation(gₖ, fₖ, H, d, ftestTR, gtestTR)
+            pred_ared_computation_stop(gₖ, fₖ, H, d, ftestTR, gtestTR)
 
         if (ratio .< eps1)
             # Bad approximation of h. We make the cubic term more prevalant
@@ -82,14 +84,16 @@ function ARC_generic_stop(h         :: AbstractNLPModel,
         end
 
         iter += 1
+        # @show iter
+        # @show t[1]
+        # @show gₖ[1]
+        # @show Δ[1]
+        # @show pred[1]
+        # @show ared[1]
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n",
-                            iter, t, gₖ[1], Δ[1], pred[1], ared[1])
+                            iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
     end
 
-    status = :NotSolved
-    (abs(gₖ) < tol) && (status = :Optimal)
-    (iter >= maxiter) && (status = :Tired)
-    tired = iter > maxiter
-    optimal = abs(gₖ) < tol
-    return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
+    optimal = OK
+    return optimal, nlpstop
 end

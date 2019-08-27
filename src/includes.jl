@@ -9,6 +9,8 @@ include("step_computation_stop.jl")
 # include("ARC1D/ARC-Cub.jl")
 # include("ARC1D/ARC-Nwt.jl")
 include("ARC1D/ARC-Nwt-Stop.jl")
+include("ARC1D/ARC-Sec-Stop.jl")
+include("ARC1D/ARC-SecA-Stop.jl")
 # include("ARC1D/ARC-Sec.jl")
 # include("ARC1D/ARC-SecA.jl")
 #

@@ -9,7 +9,7 @@ scalar_solvers = []
 # push!(scalar_solvers, ARC_SecA)
 
 #TR methods
-push!(scalar_solvers, TR_Nwt)
+# push!(scalar_solvers, TR_Nwt)
 push!(scalar_solvers, TR_Nwt_Stop)
 # push!(scalar_solvers, TR_Cub)
 # push!(scalar_solvers, TR_Sec)

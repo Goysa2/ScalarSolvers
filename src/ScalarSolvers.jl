@@ -5,8 +5,7 @@ using NLPModels
 using LinearAlgebra
 using Printf
 using State, Stopping
-# using Optimize, LSDescentMethods
-# using Polynomials
+using Polynomials
 
 include("includes.jl")
 

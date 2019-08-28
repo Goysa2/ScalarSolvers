@@ -1,8 +1,10 @@
 export TR_Sec
 
-function TR_Sec(h :: AbstractNLPModel;
+function TR_Sec(h :: AbstractNLPModel,
+				nlpstop :: AbstractStopping;
 				kwargs...)
 
-	(t, f, opt_res, iter, optimality, tired, status, hf, hg,hh) = TR_generic(h; direction = "Sec", kwargs...)
-	return (t, f, opt_res, iter, optimality, tired, status, hf, hg,hh)
+
+	optimal, stop = TR_generic(h, nlpstop; direction = :Sec, kwargs...)
+	return optimal, stop
 end

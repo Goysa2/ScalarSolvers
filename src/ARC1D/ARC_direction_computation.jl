@@ -1,26 +1,25 @@
 export ARC_step_computation
 
-function ARC_step_computation(h::Float64,
-                              g::Float64,
-                              Δ::Float64;
-                              kwargs...)
+function ARC_step_computation(h, g, Δ; kwargs...)
 
-    discr1 = (h)^2-4(g/Δ)
-    discr2 = (h)^2+4(g/Δ)
+    h2     = ((h) .^ 2)
+    gdelta = (4 .* (g ./ Δ))
+    discr1 = h2 .- gdelta
+    discr2 = h2 .+ gdelta
 
-    if h>0
-      if g>0
-        d=(-2*g)/(h+sqrt(discr2))
+    if true in (h .> .0)
+      if true in (g .> .0)
+        d = (-2 .* g) ./ (h .+ sqrt.(discr2))
       else
-        d=(-2*g)/(h+sqrt(discr1))
+        d = (-2 .* g) ./ (h .+ sqrt.(discr1))
       end
     else
-      if g<0
-        d=(-h+sqrt(discr1))/(2/Δ)
+      if true in (g .< .0)
+        d = (-h .+ sqrt.(discr1)) ./ (2 ./ Δ)
       else
-        d=(-h+sqrt(discr2))/(-2/Δ)
+        d = (-h .+ sqrt.(discr2)) ./ (-2 ./ Δ)
       end
     end
 
-    return d
+    return vec(d)
   end

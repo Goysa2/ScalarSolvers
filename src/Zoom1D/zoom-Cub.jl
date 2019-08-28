@@ -1,7 +1,10 @@
 export zoom_Cub
 
-function zoom_Cub(h :: AbstractNLPModel;
+function zoom_Cub(h :: AbstractNLPModel,
+                  nlpstop :: AbstractStopping;
+                  verbose :: Bool = true,
 				  kwargs...)
-	(t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess) = trouve_intervalleA(h; direction = "Cub", kwargs...)
-	return (t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
+
+	optimal, nlpstop = Trouve_IntervalleA(h, nlpstop; direction = :Cub, verbose = verbose, kwargs...)
+	return optimal, nlpstop
 end

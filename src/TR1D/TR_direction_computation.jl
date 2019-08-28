@@ -1,24 +1,24 @@
 export TR_step_computation
 
-function TR_step_computation(h :: Float64,
-                             g :: Float64,
-                             dN :: Float64,
-                             Δ :: Float64)
-
-  if h > 0.0
-    if g > 0.0
-      d = max(-Δ, dN)
+function TR_step_computation(h  :: Any,
+                             g  :: Any,
+                             dN :: Any,
+                             Δ  :: Any)
+  if true in (h .> 0.0)
+    if true in (g .> 0.0)
+      d = max.(-Δ, dN)
     else
-      d = min(dN, Δ)
+      d = min.(dN, Δ)
     end
   else
-    if g > 0.0
-      d = -Δ
+    if true in (g .> 0.0)
+      d = .- Δ
     else
       d = Δ
     end
   end
 
-  return d
+  d = d[1]
 
+  return [d]
 end

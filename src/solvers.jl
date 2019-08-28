@@ -3,14 +3,14 @@ export scalar_solvers
 scalar_solvers = []
 
 #ARC methods
-push!(scalar_solvers, ARC_Cub)
 push!(scalar_solvers, ARC_Nwt)
+push!(scalar_solvers, ARC_Cub)
 push!(scalar_solvers, ARC_Sec)
 push!(scalar_solvers, ARC_SecA)
 
 #TR methods
-push!(scalar_solvers, TR_Cub)
 push!(scalar_solvers, TR_Nwt)
+push!(scalar_solvers, TR_Cub)
 push!(scalar_solvers, TR_Sec)
 push!(scalar_solvers, TR_SecA)
 

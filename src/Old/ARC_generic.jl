@@ -16,53 +16,52 @@ export ARC_generic
 # aug :: Float64. Rate at which we augment Δ if we have a bad approximation
 # Δ :: Float64. Size of the trust region at the begining of the algorithm.
 
-function ARC_generic(h         :: AbstractNLPModel,
-                     nlpstop   :: AbstractStopping;
-                     verbose   :: Bool = true,
-                     eps1      :: Float64 = 0.25,
-                     eps2      :: Float64 = 0.75,
-                     red       :: Float64 = 0.2,
-                     aug       :: Float64 = 5.0,
-                     Δ         :: Float64 = 0.5,
-                     direction :: Symbol = :Nwt)
+function ARC_generic(h :: AbstractNLPModel;
+                     t₀ :: Float64 = h.meta.x0[1],
+                     tol :: Float64 = 1e-7,
+                     maxiter :: Int = 50,
+                     verbose :: Bool = true,
+                     eps1 :: Float64 = 0.25,
+                     eps2 :: Float64 = 0.75,
+                     red :: Float64 = 0.2,
+                     aug :: Float64 = 5.0,
+                     Δ :: Float64 = 0.5,
+                     direction :: String = "Nwt")
 
-    Δ = [Δ]
-    t = h.meta.x0; iter = 0;        # We establish our starting point t
-    fₖ = obj(h, t);
-    f₀ = copy(fₖ)
-    gₖ = grad(h, t);
-    g₀ = copy(gₖ)
+    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
+    t = t₀; iter = 0;                # We establish our starting point t
+    fₖ = obj(h, [t])[1]; gₖ = grad(h, [t])[1]; # And h(t) and h''(t)
 
 
     # H denotes the (approximation of the) second derivative
-    if direction == :Nwt
-      H = hess(h, t)
-    elseif direction == :Sec || direction == :SecA
-      H = [1.0]
+    if direction == "Nwt"
+      H = hess(h, [t])[1]
+    elseif direction == "Sec" || direction == "SecA"
+      H = 1.0
     end
 
-    OK = update_and_start!(nlpstop, x = t, fx = fₖ, gx = gₖ, g0 = g₀, Hx = H)
+    #q(d) = fₖ + gₖ*d + 0.5*secₖ*d^2 + (1/3*(Δ))*abs(d)^3
 
     verbose &&
         @printf(" iter  t         gₖ          Δ        pred         ared\n")
     verbose &&
-        @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t[1], gₖ[1], Δ[1])
+        @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t, gₖ[1], Δ)
     # We loop until we have a minimizer or we have reached the maximum number of
     # iterations.
-    while !OK
+    while ((abs(gₖ) > tol) & (iter < maxiter)) | (iter == 0)
 
         d = ARC_step_computation(H, gₖ, Δ) # We find the direction in which we
-                                                # move
+                                           # move
         # Numerical reduction computation
-        ftestTR = obj(h, t + d)  # Value of h and h' at t + d
-        gtestTR = grad(h, t + d)
+        ftestTR = obj(h, [t + d])[1]  # Value of h and h' at t + d
+        gtestTR = grad(h, [t + d])[1]
 
         # We check to see if we have a good approximation of h using the ratio
         # of the actual reduction and the predicted reduction.
         (pred, ared, ratio) =
             pred_ared_computation(gₖ, fₖ, H, d, ftestTR, gtestTR)
 
-        if (ratio .< eps1)
+        if (ratio < eps1)
             # Bad approximation of h. We make the cubic term more prevalant
             Δ = red * Δ
         else
@@ -75,14 +74,17 @@ function ARC_generic(h         :: AbstractNLPModel,
                 # cubic term.
                 Δ = aug * Δ
             end
-            OK = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, Hx = H)
         end
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n",
-                            iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
+                            iter, t, gₖ[1], Δ, pred, ared)
     end
 
-    optimal = OK
-    return optimal, nlpstop
+    status = :NotSolved
+    (abs(gₖ) < tol) && (status = :Optimal)
+    (iter >= maxiter) && (status = :Tired)
+    tired = iter > maxiter
+    optimal = abs(gₖ) < tol
+    return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
 end

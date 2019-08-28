@@ -1,8 +1,10 @@
 export zoom_SecA
 
-function zoom_SecA(h :: AbstractNLPModel;
-				  kwargs...)
+function zoom_SecA(h :: AbstractNLPModel,
+                   nlpstop :: AbstractStopping;
+                   verbose :: Bool = true,
+				   kwargs...)
 
-	(t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess) = trouve_intervalleA(h; direction = "SecA", kwargs...)
-	return (t, fₖ, normg, iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
+	optimal, nlpstop = Trouve_IntervalleA(h, nlpstop; direction = :SecA, verbose = verbose, kwargs...)
+	return optimal, nlpstop
 end

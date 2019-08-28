@@ -1,20 +1,18 @@
 using ScalarSolvers
-using Base.Test
+using Test
 
-using JuMP, NLPModels, Optimize, Polynomials
+using JuMP, NLPModels, NLPModelsJuMP
+using State, Stopping
 using OptimizationProblems
-
-nlp = MathProgNLPModel(AMPGO02())
-h = LineModel(nlp, [0.0], [1.0]);
+using Polynomials
 
 for solver in scalar_solvers
-  println(solver)
-  (topt, iter) = solver(h, 2.7, 7.5, verbose = true)
-  nftot = nlp.counters.neval_obj +
-          nlp.counters.neval_grad +
-          nlp.counters.neval_hess
-  println("Total functions and derivatives (and hessian if necessary): ",
-           nftot, "  iterations: ", iter)
-  println("(topt, iter)=", (topt, iter))
-  reset!(nlp)
+    printstyled("we solve AMPGO02 using $solver \n", color = :green)
+    nlp = MathProgNLPModel(AMPGO02());
+    nlp_at_x = NLPAtX([3.7])
+    nlp_stop = NLPStopping(nlp, Stopping.unconstrained, nlp_at_x)
+    optimal, stop = eval(solver)(nlp, nlp_stop, verbose = true)
+    status(stop) == :Optimal ? color_status = :light_green : color_status = :light_yellow
+    printstyled("status = $(String(status(stop))) \n", color = color_status)
+    @test status(stop) == :Optimal
 end

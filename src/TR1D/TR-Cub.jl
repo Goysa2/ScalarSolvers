@@ -1,46 +1,40 @@
 export TR_Cub
-function TR_Cub(h :: AbstractNLPModel;
-               t₀ :: Float64 = h.meta.x0[1],
-               tol :: Float64 = 1e-7,
-               maxiter :: Int = 50,
-               verbose :: Bool = true,
-               eps1 ::Float64 = 0.2,
-               eps2 :: Float64 = 0.8,
-               red :: Float64 = 0.5,
-               aug :: Float64 = 2.0,
-               Δ :: Float64 = 1.0)
+function TR_Cub(h :: AbstractNLPModel,
+                nlpstop :: AbstractStopping;
+                t₀ = h.meta.x0, verbose = true, eps1 = 0.2, eps2 = 0.8,
+                red = 0.5, aug = 2.0, Δ = 1.0)
+    Δ  = [Δ]
+    t  = t₀; iter = 0;
+    fₖ = obj(h, t); gₖ = grad(h, t);
 
-    (length(h.meta.x0) > 1) && warn("Not a 1-D problem ")
-    t = t₀; iter = 0;
-    fₖ = obj(h, [t])[1]
-    gₖ = grad(h, [t])[1]
+    secₖ = [1.0]
+    dN = -gₖ # for the first iteration
+    A = [0.5]; B = [0.0];
 
-    secₖ = 1.0
-    dN = -gₖ #pour la première itération
-    A = 0.5; B = 0.0
+    q(d) = fₖ .+ gₖ .* d .+ A .* d .^ 2 .+ B .* d .^ 3
 
-    q(d) = fₖ + gₖ * d + A * d^2 + B * d^3
+    OK  = update_and_start!(nlpstop, x = t, fx = fₖ, gx = gₖ, g0 = copy(gₖ))
 
     verbose && @printf(" iter  t         gₖ          Δ        pred         ared\n")
-    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter,t,gₖ,Δ)
+    verbose && @printf(" %4d %7.2e  %7.2e  %7.2e \n", iter, t[1], gₖ[1], Δ[1])
 
-    while ((abs(gₖ) > tol) & (iter < maxiter)) | (iter == 0)
+    while !OK
 
-        if q(Δ) < q(-Δ)
+        if true in (q(Δ) .< q(-Δ))
             d = Δ
         else
             d = -Δ
         end
 
-        cub(t) = fₖ + gₖ * t + A * t^2 + B * t^3
-        #dcub(t)=gₖ+2*A*t+3*B*t^2
-        dR = roots(Poly([gₖ, 2 * A, 3 * B]))
+        cub(t) = fₖ .+ gₖ .* t .+ A .* t .^ 2 .+ B .* t .^ 3
+
+        dR = roots(Poly([gₖ[1], 2.0 .* A[1], 3.0 .* B[1]]))
 
         if isreal(dR)
           dR = real(dR)
           dN2 = dR[1]
           if length(dR) > 1
-            if (cub(dR[2]) < cub(dR[1]))
+            if true in ((cub(dR[2]) .< cub(dR[1])))
               dN2 = dR[2]
             end
           end
@@ -48,58 +42,54 @@ function TR_Cub(h :: AbstractNLPModel;
           dN2 = -gₖ * s / y
         end
 
-        if (abs(dN2) < Δ) & (q(d) > q(dN2))
+        if true in ((abs.(dN2) .< Δ)) && true in ((q(d) .> q(dN2)))
             d = dN2
         end
 
-        if d == 0.0
-            return (t, fₖ, norm(gₖ, Inf), iter + 1, false, false, :FailedDirectionComputation, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
-            #L'OUTIL DE CALCUL DES RACINES DU PACKAGE Polynomials ARRONDIE À 0 CERTAINES RACINES D'OÙ LA NOUVELLE CONDITION
+        if true in (d .== 0.0)
+            return OK, nlpstop  # still useful?
         end
 
-        ftestTR = obj(h, [t + d])[1]
-        gtestTR = grad(h, [t + d])[1]
+        ftestTR = obj(h, t .+ d)
+        gtestTR = grad(h, t .+ d)
 
-        pred = gₖ * d + A * d^2 + B * d^3
+        pred = gₖ .* d .+ A .* d .^ 2 .+ B .* d .^ 3
 
-        if pred > - 1e-10
-            ared = (gₖ + gtestTR) * d / 2
+        if true in (pred .> - 1e-10)
+            ared = (gₖ .+ gtestTR) .* d ./ 2
         else
-            ared = ftestTR - fₖ
+            ared = ftestTR .- fₖ
         end
 
-        ratio = ared / pred
-        if (ratio < eps1) & (abs(d) == Δ)
+        ratio = ared ./ pred
+        if true in ((ratio .< eps1)) && true in ((abs.(d) .== Δ))
             Δ = red * Δ
         else
           #two points memory
           tpred = t; gkm1 = gₖ; fkm1 = fₖ
-          t = t + d; gₖ = gtestTR; fₖ = ftestTR
+          t = t .+ d; gₖ = gtestTR; fₖ = ftestTR
 
           #cubic two points interpolation
-          s = t - tpred; y = gₖ - gkm1
+          s = t .- tpred; y = gₖ .- gkm1
 
           α = -s
-          z = gₖ + gkm1 + 3 * (fₖ - fkm1) / α
-          discr = z^2 - gₖ * gkm1
-          denom = gₖ + gkm1 + 2 * z
-          B = 1 / 3 * (gₖ + gkm1 +2 * z) / (α * α)
-          A = -(gₖ + z) / α
+          z = gₖ .+ gkm1 .+ 3. .* (fₖ .- fkm1) ./ α
+          discr = z .^ 2 .- gₖ .* gkm1
+          denom = gₖ .+ gkm1 .+ 2 .* z
+          B = 1 ./ 3 .* (gₖ .+ gkm1 .+ 2. .* z) ./ (α .* α)
+          A = -(gₖ .+ z) ./ α
 
-          if ratio > eps2
+          if true in (ratio .> eps2)
             Δ = aug * Δ
           end
         end
 
+        OK  = update_and_start!(nlpstop, x = t, fx = fₖ, gx = gₖ, g0 = copy(gₖ));
+
         iter += 1
-        verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter,t,gₖ,Δ,pred,ared)
+        verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
     end
 
-    status = :NotSolved
-    (abs(gₖ) < tol) && (status = :Optimal)
-    (iter >= maxiter) && (status = :Tired)
-    tired = iter > maxiter
-    optimal = abs(gₖ) < tol
-    return (t, fₖ, norm(gₖ, Inf), iter, optimal, tired, status, h.counters.neval_obj, h.counters.neval_grad, h.counters.neval_hess)
-
+    optimal = OK
+    return optimal, nlpstop
 end

@@ -1,8 +1,9 @@
 export ARC_Nwt
 
-function ARC_Nwt(h :: AbstractNLPModel;
-				 kwargs...)
+function ARC_Nwt(h :: AbstractNLPModel,
+					  nlpstop :: AbstractStopping;
+				 	  kwargs...)
 
-	(t, f, opt_res, iter, optimality, tired, status, hf, hg,hh) = ARC_generic(h; direction = "Nwt", kwargs...)
-	return (t, f, opt_res, iter, optimality, tired, status, hf, hg,hh)
+	OK, stop = ARC_generic(h, nlpstop; direction = :Nwt, kwargs...)
+	return OK, stop
 end

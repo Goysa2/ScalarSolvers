@@ -1,8 +1,9 @@
 export ARC_Sec
 
-function ARC_Sec(h :: AbstractNLPModel;
-				 kwargs...)
+function ARC_Sec(h :: AbstractNLPModel,
+					  nlpstop :: AbstractStopping;
+				 	  kwargs...)
 
-	(t, f, opt_res, iter, optimality, tired, status, hf, hg,hh) = ARC_generic(h; direction = "Sec", kwargs...)
-	return (t, f, opt_res, iter, optimality, tired, status, hf, hg,hh)
+	OK, stop = ARC_generic(h, nlpstop; direction = :Sec, kwargs...)
+	return OK, stop
 end

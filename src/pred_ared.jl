@@ -1,23 +1,16 @@
 export pred_ared_computation
-function pred_ared_computation(gₖ :: Float64,
-                               fₖ :: Float64,
-                               dersec :: Float64,
-                               d :: Float64,
-                               ftestTR :: Float64,
-                               gtestTR :: Float64;
-                               seuil :: Float64=-1e-10)
 
-  pred = gₖ * d + 0.5 * dersec * d^2
+function pred_ared_computation(gₖ, fₖ, dersec, d, ftestTR, gtestTR;
+                               seuil = -1e-10)
+  pred = gₖ .* d + 0.5 .* dersec .* d .^ 2
 
-  if pred > seuil
-    #print_with_color(:yellow,"!!")
-    ared = (gₖ + gtestTR) * d / 2
+  if true in (pred .> seuil)
+    ared = (gₖ .+ gtestTR) .* d ./ 2.0
   else
-    #print_with_color(:green,"!!")
-    ared = ftestTR - fₖ
+    ared = ftestTR .- fₖ
   end
 
-  ratio = ared / pred
+  ratio = ared ./ pred
 
-  return (pred, ared, ratio)
+  return (pred[1], ared[1], ratio[1])
 end

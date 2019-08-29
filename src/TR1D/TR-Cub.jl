@@ -7,7 +7,8 @@ function TR_Cub(h :: AbstractNLPModel,
     t  = t₀; iter = 0;
     fₖ = obj(h, t); gₖ = grad(h, t);
 
-    secₖ = [1.0]
+    s = t .- t₀; y = gₖ # just for first iteration 
+
     dN = -gₖ # for the first iteration
     A = [0.5]; B = [0.0];
 
@@ -39,7 +40,7 @@ function TR_Cub(h :: AbstractNLPModel,
             end
           end
         else
-          dN2 = -gₖ * s / y
+          dN2 = -gₖ .* s ./ y
         end
 
         if true in ((abs.(dN2) .< Δ)) && true in ((q(d) .> q(dN2)))

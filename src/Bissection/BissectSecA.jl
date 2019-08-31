@@ -69,6 +69,6 @@ function bissect_secA(h :: AbstractNLPModel,
                   iter, tp[1], t[1], dN[1], gk[1], gplus[1])
       end
 
-      optimal = OK
+      optimal = nlpstop.meta.optimal
       return optimal, nlpstop
 end

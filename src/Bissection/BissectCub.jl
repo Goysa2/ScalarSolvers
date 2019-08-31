@@ -71,6 +71,6 @@ function bissect_Cub(h :: AbstractNLPModel,
                 iter, tₚ[1], t[1], dN[1], gₖ[1], gplus[1])
   end
 
-  optimal = OK
+  optimal = nlpstop.meta.optimal
   return optimal, nlpstop
 end # function

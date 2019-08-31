@@ -65,6 +65,7 @@ function ARC_generic(h         :: AbstractNLPModel,
         if (ratio .< eps1)
             # Bad approximation of h. We make the cubic term more prevalant
             Δ = red * Δ
+            add_stop!(nlpstop.meta)
         else
             # Good approximation we move towards the minimizer of c
             (t, fₖ, gₖ, H) =
@@ -83,6 +84,6 @@ function ARC_generic(h         :: AbstractNLPModel,
                             iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
     end
 
-    optimal = OK
+    optimal = nlpstop.meta.optimal
     return optimal, nlpstop
 end

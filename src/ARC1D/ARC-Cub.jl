@@ -93,7 +93,7 @@ function ARC_Cub(h       :: AbstractNLPModel,
       iter += 1
       verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
     end
-    optimal = OK
+    optimal = nlpstop.meta.optimal
     return optimal, nlpstop
 
 end

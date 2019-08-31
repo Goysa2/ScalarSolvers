@@ -85,12 +85,12 @@ function TR_Cub(h :: AbstractNLPModel,
           end
         end
 
-        OK  = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, g0 = copy(gₖ));
+        OK  = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ);
 
         iter += 1
         verbose && @printf(" %4d %7.2e  %7.2e  %7.2e %7.2e %7.2e\n", iter, t[1], gₖ[1], Δ[1], pred[1], ared[1])
     end
 
-    optimal = OK
+    optimal = nlpstop.meta.optimal
     return optimal, nlpstop
 end

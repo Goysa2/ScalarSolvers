@@ -110,5 +110,5 @@ function zoom_generic(h :: AbstractNLPModel,
 
     end
 
-    return OK, nlpstop
+    return nlpstop.meta.optimal, nlpstop
 end #function

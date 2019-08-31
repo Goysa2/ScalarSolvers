@@ -35,6 +35,6 @@ function bissect(h       :: AbstractNLPModel,
 
     topt = (tₐ .+ tᵦ) ./ 2.0
     update!(nlpstop.current_state, x = topt, gx = grad(h, topt))
-    optimal = OK
+    optimal = nlpstop.meta.optimal
     return optimal, nlpstop
 end

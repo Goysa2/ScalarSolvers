@@ -56,6 +56,6 @@ function bissect_sec(h :: AbstractNLPModel,
         @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n",
                 iter, tₚ[1], t[1], dN[1], gₖ[1], gplus[1])
   end
-    optimal = OK
+    optimal = nlpstop.meta.optimal
     return optimal, nlpstop
 end

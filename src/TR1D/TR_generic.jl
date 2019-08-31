@@ -62,6 +62,7 @@ function TR_generic(h :: AbstractNLPModel,
         if (ratio .< eps1) &&  (true in (abs.(d) .== Δ))
             # Bad approximation of h. Reduction of the size of the trust region
             Δ = red * Δ
+            add_stop!(nlpstop.meta)
             # printstyled("on a reduit delta \n", color = :red)
         else
             # Good approximation we move towards the minimizer of q
@@ -73,6 +74,7 @@ function TR_generic(h :: AbstractNLPModel,
                 Δ = aug * Δ
             end
             OK = update_and_stop!(nlpstop, x = t, fx = fₖ, gx = gₖ, Hx = H)
+            # @show OK
         end
 
 
@@ -81,6 +83,7 @@ function TR_generic(h :: AbstractNLPModel,
                            iter, t[1], gₖ[1], Δ[1], pred, ared)
     end
 
-    optimal = OK 
+    optimal = nlpstop.meta.optimal
+    # @show optimal
     return optimal, nlpstop
 end

@@ -4,10 +4,10 @@ function bissect_sec(h :: AbstractNLPModel,
                      t1 = h.meta.x0, t2 = 100.0,
                      verbose = false)
 
-    (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)
-    γ = 0.8; t = tᵦ; tₚ = tₐ; tqnp = tₐ
-    hₖ = [0.0]; hkm1 = [0.0]; gkm1 = [0.0]; hplus = [0.0];
-    iter = 0
+  (tₐ, tᵦ) = trouve_intervalle(h, t1, 2.5)
+  γ = 0.8; t = tᵦ; tₚ = tₐ; tqnp = tₐ
+  hₖ = [0.0]; hkm1 = [0.0]; gkm1 = [0.0]; hplus = [0.0];
+  iter = 0
 
   gₖ = grad(h, t)
   gkm1 = grad(h, tqnp)
@@ -56,6 +56,6 @@ function bissect_sec(h :: AbstractNLPModel,
         @printf(" %7.2e %7.2e %7.2e  %7.2e  %7.2e  %7.2e\n",
                 iter, tₚ[1], t[1], dN[1], gₖ[1], gplus[1])
   end
-    optimal = nlpstop.meta.optimal
-    return optimal, nlpstop
+  optimal = nlpstop.meta.optimal
+  return optimal, nlpstop
 end

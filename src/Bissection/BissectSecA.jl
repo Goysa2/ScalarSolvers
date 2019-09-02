@@ -24,14 +24,13 @@ function bissect_secA(h :: AbstractNLPModel,
                 iter, tp[1], t[1], 0.0, gk[1], 0.0)
 
     while !OK
-        s = t .- tqnp
-        y = gk .- gkm1
+        s = t .- tqnp; y = gk .- gkm1
 
         Γ = [3.0] .* (gk .+ gkm1) .* s .- [6.0] .* (hk .- hkm1)
         if y .* s .+ Γ < eps.(Float64) .* (s .^ 2)
-          yt = y
-        else
           yt = y .+ Γ ./ s
+        else
+          yt = y #.+ Γ ./ s
         end
         dN = vec(-gk .* s ./ yt)
 
